@@ -217,6 +217,26 @@
                 container.appendChild(btn);
             });
         }
+        // -------------------------------------------------------------
+        // TIMER SCRIPT (90 Mins)
+        // -------------------------------------------------------------
+        let totalSeconds = 90 * 60;
+        const timerDisplay = document.getElementById('timer-display');
+
+        const timerInterval = setInterval(() => {
+            let minutes = Math.floor(totalSeconds / 60);
+            let seconds = totalSeconds % 60;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+            timerDisplay.innerText = `${minutes}:${seconds}`;
+
+            if (totalSeconds <= 0) {
+                clearInterval(timerInterval);
+                alert("Time Over! Test automatically submit ho raha hai.");
+                submitTest();
+            }
+            totalSeconds--;
+        }, 1000);
 
         function switchSection(index) {
             currentSectionIndex = index;
