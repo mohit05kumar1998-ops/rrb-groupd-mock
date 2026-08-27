@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RRB Group D CBT Exam - 27/11/2025 (Shift 3)</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { background: #f0f0f0; display: flex; flex-direction: column; height: 100vh; }
+        
+        /* Top Navigation Header */
+        header { background: #337ab7; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Section Tabs Header (TCS iON Style) */
+        .section-header { background: #e0e0e0; padding: 8px 15px; border-bottom: 2px solid #ccc; display: flex; gap: 8px; flex-wrap: wrap; }
+        .section-btn { background: #fff; border: 1px solid #b6b6b6; padding: 6px 14px; cursor: pointer; font-size: 13px; font-weight: bold; border-radius: 3px 3px 0 0; }
+        .section-btn.active { background: #337ab7; color: white; border-color: #337ab7; }
+
+        /* Main Exam Body */
+        .main-container { display: flex; flex: 1; overflow: hidden; }
+        .question-area { flex: 1; padding: 20px; background: white; overflow-y: auto; }
+        .palette-area { width: 300px; background: #eef2f5; border-left: 1px solid #ccc; padding: 15px; display: flex; flex-direction: column; }
+        
+        /* Question Palette Grid */
+        .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 15px; max-height: 80vh; overflow-y: auto; }
+        .p-btn { padding: 8px; border: 1px solid #999; background: #fff; text-align: center; cursor: pointer; border-radius: 4px; font-size: 12px; }
+        .p-btn.active { border: 2px solid #000; font-weight: bold; }
+        .p-btn.answered { background: #5cb85c; color: white; border-color: #4cae4c; }
+        .p-btn.review { background: #8a6d3b; color: white; }
+
+        /* Question Content */
+        .q-title { font-size: 16px; margin-bottom: 15px; font-weight: bold; line-height: 1.4; }
+        .option-item { margin-bottom: 10px; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .option-item:hover { background-color: #f9f9f9; }
+        
+        /* Footer Controls */
+        footer { background: #f5f5f5; padding: 10px 20px; border-top: 1px solid #ccc; display: flex; justify-content: space-between; }
+        .btn { padding: 8px 16px; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 13px; }
+        .btn-primary { background: #337ab7; color: white; }
+        .btn-success { background: #5cb85c; color: white; }
+        .btn-warning { background: #f0ad4e; color: white; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div><strong>RRB Group D CBT Test - 27/11/2025 (Shift 3)</strong></div>
+        <div>Time Left: <span id="timer">90:00</span></div>
+    </header>
+
+    <!-- SECTION SWITCH TABS -->
+    <div class="section-header" id="section-tabs"></div>
+
+    <div class="main-container">
+        <!-- Question Display Box -->
+        <div class="question-area">
+            <div class="q-title" id="question-text">Loading question...</div>
+            <div id="options-container"></div>
+        </div>
+
+        <!-- Question Palette (Right Side) -->
+        <div class="palette-area">
+            <h4>Question Palette</h4>
+            <div class="palette-grid" id="palette-grid"></div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <footer>
+        <div>
+            <button class="btn btn-warning" onclick="markForReview()">Mark for Review</button>
+            <button class="btn" onclick="clearResponse()">Clear Response</button>
+        </div>
+        <div>
+            <button class="btn btn-primary" onclick="saveAndNext()">Save & Next</button>
+        </div>
+    </footer>
+
+    <script>
+        // PDF (Shift 3 - 27/11/2025) se Extract kiya gaya Section-wise Questions Data Structure
+        const examData = [
+            {
+                sectionName: "General Science",
+                questions: [
+                    { id: 1, text: "Q.1 निम्नलिखित कार्बनिक यौगिकों में से कौन-सा संतृप्त है?", options: ["ब्रोमोप्रोपेन (Bromopropane)", "2-ब्रोमोप्रोपीन (2-Bromopropene)", "प्रोपाइन (Propyne)", "प्रोपीन (Propene)"], correct: 0 },
+                    { id: 2, text: "Q.2 निम्नलिखित में से किसमें ऋजु-श्रृंखला वाले हाइड्रोकार्बन होते हैं?", options: ["2-मेथिलप्रोपेन", "आइसोब्यूटेन", "ब्यूटेन", "3-मेथिलपेंटेन"], correct: 2 },
+                    { id: 3, text: "Q.3 निम्नलिखित में से किसमें सबसे अधिक अम्लीयता होती है?", options: ["जल", "सिरका", "नींबू का रस", "दूध"], correct: 2 },
+                    { id: 4, text: "Q.4 निम्नलिखित में से कौन-सा, सबसे तेजी से विसरण दर्शाएगा?", options: ["गैस में गैस", "ठोस में ठोस", "द्रव में ठोस", "गैस में द्रव"], correct: 0 },
+                    { id: 5, text: "Q.5 विद्युत ऊर्जा, शक्ति और समय के बीच क्या संबंध होता है?", options: ["ऊर्जा = समय - शक्ति", "ऊर्जा = शक्ति × समय", "ऊर्जा = शक्ति + समय", "ऊर्जा = शक्ति / समय"], correct: 1 },
+                    { id: 6, text: "Q.6 जब बंदूक चलाई जाती है तो गोली आगे की ओर बढ़ती है क्योंकि...............", options: ["बैरल कोई बल नहीं लगाता", "गुरुत्वाकर्षण इसे आगे की ओर धकेलता है", "वायु प्रतिरोध आगे की ओर कार्य करता है", "बंदूक की प्रतिक्षेप प्रतिक्रिया के रूप में पीछे की ओर कार्य करती है"], correct: 3 },
+                    { id: 7, text: "Q.7 निम्नलिखित में से किस विधि में जंग लगने से बचाने के लिए इस्पात और लोहे पर जिंक की परत का विलेपन शामिल है?", options: ["विद्युत-लेपन", "कैथोडी रक्षण", "निश्चेष्टन", "गैल्वेनीकरण"], correct: 3 },
+                    { id: 8, text: "Q.8 सामान्यतः किस पोषी स्तर पर जीवों की संख्या सबसे कम होती है?", options: ["प्राथमिक उपभोक्ता", "तृतीयक उपभोक्ता", "उत्पादक", "द्वितीयक उपभोक्ता"], correct: 1 },
+                    { id: 9, text: "Q.9 निम्नलिखित में से कौन-सा मानव रोग, यौन क्रिया (sexual act) के दौरान संचारित हो सकता है?", options: ["मधुमेह", "कैंसर", "प्रोटीन ऊर्जा कुपोषण", "उपार्जित प्रतिरक्षा न्यूनता संलक्षण (AIDS)"], correct: 3 },
+                    { id: 10, text: "Q.10 5 C आवेश (Q) को 15 V विभवान्तर वाले दो बिन्दुओं पर ले जाने में कितना कार्य (W) किया जाता है?", options: ["3 J", "75 J", "15 J", "1/3 J"], correct: 1 },
+                    { id: 11, text: "Q.11 निम्नलिखित में से कौन-सा पादप, पर्ण के कोरों पर मुकुलन द्वारा अलैंगिक रूप से पुनरुत्पादन करता है?", options: ["आम (Mango)", "ब्रायोफिलम (Bryophyllum)", "स्पाइरोगाइरा (Spirogyra)", "हाइड्रा (Hydra)"], correct: 1 },
+                    { id: 12, text: "Q.12 लेंस द्वारा उत्पन्न आवर्धन, वस्तु-दूरी (u) और प्रतिबिंब-दूरी (v) से किस सूत्र द्वारा संबंधित है?", options: ["m = u / v", "m = u + v", "m = v - u", "m = v / u"], correct: 3 },
+                    { id: 13, text: "Q.13 निम्नलिखित में से कौन-सा प्रेक्षण सर्वोत्तम रूप से इसकी व्याख्या करता है कि द्रवों का आयतन निश्चित होता है लेकिन उनकी आकृति निश्चित नहीं होती?", options: ["एक स्पंज को निष्पीडित करने पर उसकी आकृति बदल जाती है", "एक ठोस लोहे का टुकड़ा किसी भी पात्र में अपनी आकृति बनाए रखता है", "जल, अपने पात्र की आकृति को ग्रहण कर लेता है, लेकिन इसका आयतन वही बना रहता है", "वायु पूरे पात्र में प्रसारित हो जाती है"], correct: 2 },
+                    { id: 14, text: "Q.14 निम्नलिखित में से कौन-सा गैसों का एक अभिलक्षण है?", options: ["संपीड्य, लेकिन द्रव नहीं", "निश्चित आकार और आयतन", "कोई निश्चित आकार और कोई निश्चित आयतन नहीं", "कोई निश्चित आकार नहीं, लेकिन आयतन निश्चित"], correct: 2 },
+                    { id: 15, text: "Q.15 निम्नलिखित में से किस कोशिका अंगक में ATP-जनरेटिंग रासायनिक अभिक्रियाओं हेतु पर्याप्त पृष्ठीय क्षेत्रफल होता है?", options: ["रसधानी (Vacuoles)", "लयनकाय (Lysosomes)", "कोशिका भित्ति (Cell wall)", "सूत्रकणिका (Mitochondria)"], correct: 3 },
+                    { id: 16, text: "Q.16 चन्द्रमा पर किसी पिंड का भार पृथ्वी की अपेक्षा कम होता है, क्योंकि", options: ["चंद्रमा पर पिंड का द्रव्यमान घटता है", "चंद्रमा का द्रव्यमान पृथ्वी के द्रव्यमान के बराबर है", "चंद्रमा पर वायुमंडल नहीं है", "चंद्रमा पर गुरूत्वीय त्वरण कम होता है"], correct: 3 },
+                    { id: 17, text: "Q.17 'm' kg द्रव्यमान का एक पिंड पृथ्वी की सतह से 'h' m की ऊंचाई पर रखा गया है। इस पिंड की स्थितिज ऊर्जा क्या होगी?", options: ["mgh", "m²gh", "hg/m", "mh/g"], correct: 0 },
+                    { id: 18, text: "Q.18 ऑक्सीजन जैसे सूक्ष्म अणु, कोशिका झिल्ली से आसानी से क्यों गुजर सकते हैं, लेकिन स्टार्च या प्रोटीन जैसे बड़े अणु नहीं गुजर सकते?", options: ["कोशिका झिल्ली पूरी तरह से ठोस होती है।", "प्रवेश के लिए बड़े अणुओं को टूटना पड़ता है।", "कोशिका झिल्ली, चयनात्मक पदार्थों के लिए पारगम्य होती है।", "छोटे अणुओं में आगे बढ़ने के लिए विशेष ऊर्जा होती है।"], correct: 2 },
+                    { id: 19, text: "Q.19 किसी मेज पर मंद आघात करने पर उत्पन्न ध्वनि के मृदु होने का क्या कारण है?", options: ["कंपन का आयाम छोटा होता है", "तरंगदैर्ध्य लघु हो जाती है", "ध्वनि की चाल कम हो जाती है", "कंपन की आवृत्ति निम्न होती है"], correct: 0 },
+                    { id: 20, text: "Q.20 HIV संचरण के संबंध में निम्नलिखित में से कौन-सा कथन सत्य है?", options: ["HIV ऐरोसोल के माध्यम से संचारित हो सकता है।", "HIV यौन क्रियाओं से संचारित हो सकता है।", "HIV मच्छर के काटने से संचारित हो सकता है।", "HIV आकस्मिक संपर्क से संचारित हो सकता है।"], correct: 1 },
+                    { id: 21, text: "Q.21 एकल फसल खेती की तुलना में अंतरासस्यन (intercropping) किस प्रकार लाभदायक है?", options: ["सिंचाई की आवश्यकताओं में वृद्धि करता है", "कम भूमि की आवश्यकता होती है", "श्रम लागत कम करता है", "पोषक तत्वों का कुशलतापूर्वक उपयोग करता है और रोगों के प्रसार को रोकता है"], correct: 3 },
+                    { id: 22, text: "Q.22 एक कार विरामावस्था से चलना शुरू करती है और 5 सेकंड तक समान रूप से 2 m/s² पर त्वरित होती है। कार का अंतिम वेग क्या है?", options: ["15 m/s", "10 m/s", "5 m/s", "20 m/s"], correct: 1 },
+                    { id: 23, text: "Q.23 जब कार्बन डाइऑक्साइड को चूने के पानी से होकर प्रवाहित किया जाता है, तो ________ अवक्षेपित होता है।", options: ["CaCO3", "CaSO4", "Ca(OH)2", "Ca(HCO3)2"], correct: 0 },
+                    { id: 24, text: "Q.24 माइटोकॉन्ड्रिया इसलिए विशेष हैं क्योंकि उनमें स्वयं का DNA और राइबोसोम पाए जाते हैं। इस आधार पर उसके क्या कार्य हैं?", options: ["कोशिका में स्वयं विचरण करना", "अपने स्वयं के कुछ प्रोटीन बनाना", "लाइसोसोम की तरह सामग्रियों का पाचन करना", "पौधों के समान सूर्य के प्रकाश का उपयोग करके भोजन बनाना"], correct: 1 },
+                    { id: 25, text: "Q.25 एक उत्तल दर्पण के ध्रुव और वक्रता केंद्र के बीच की दूरी +40 cm है। इस दर्पण के ध्रुव और फोकस के बीच दूरी कितनी होगी?", options: ["+40 cm", "-40 cm", "+20 cm", "-20 cm"], correct: 2 }
+                ]
+            },
+            {
+                sectionName: "Mathematics",
+                questions: [
+                    { id: 26, text: "Q.26 एक पर्स में केवल ₹5 और ₹10 के सिक्के हैं। सिक्कों की कुल संख्या 118 है और उनका कुल मूल्य ₹855 है। ₹5 के कितने सिक्के हैं?", options: ["65", "56", "55", "53"], correct: 0 },
+                    { id: 27, text: "Q.27 एक वॉशिंग मशीन की कीमत एक TV की कीमत से 40% कम है। यदि वॉशिंग मशीन की कीमत 80% बढ़ जाती है और TV की कीमत 22% कम हो जाती है, तो 7 वॉशिंग मशीनों और 6 TV की कुल कीमत में कितने प्रतिशत परिवर्तन होगा?", options: ["21% की वृद्धि", "18% की कमी", "20% की वृद्धि", "15% की कमी"], correct: 2 },
+                    { id: 28, text: "Q.28 प्रथम 50 सम प्राकृत संख्याओं का औसत कितना है?", options: ["54", "52", "51", "50"], correct: 2 },
+                    { id: 29, text: "Q.29 यदि ₹485 अंकित मूल्य वाली एक वस्तु को ₹293 में बेचा जाता है, तो छूट प्रतिशत क्या है?", options: ["39.59%", "38.99%", "36.76%", "42.85%"], correct: 0 },
+                    { id: 30, text: "Q.30 4 ÷ 24 + 3.6 × (1/9) - {1/15 + (1 - 1.5)} को सरल कीजिए।", options: ["2", "0", "3", "1"], correct: 3 },
+                    { id: 31, text: "Q.31 11 व्यक्ति 19 दिनों में 59 फीट गहरा कुआँ खोद सकते हैं। कितने व्यक्ति 2 दिनों में 118 फीट गहरा कुआँ खोद सकते हैं?", options: ["209", "208", "206", "211"], correct: 0 },
+                    { id: 32, text: "Q.32 267 मीटर और 153 मीटर लंबी दो ट्रेनें समान दिशा में क्रमशः 162 km/hr और 36 km/hr की चाल से चल रही हैं। तेज़ चलने वाली ट्रेन को धीमी चलने वाली ट्रेन को पूरी तरह से ओवरटेक करने में कितना समय लगेगा?", options: ["22 सेकंड", "12 सेकंड", "17 सेकंड", "18 सेकंड"], correct: 1 },
+                    { id: 33, text: "Q.33 किसी कक्षा में 51 विद्यार्थियों की औसत आयु 24 वर्ष है। यदि शिक्षक की आयु भी शामिल कर ली जाए, तो पूरे समूह की औसत आयु 25 वर्ष हो जाती है। शिक्षक की आयु (वर्ष में) ज्ञात कीजिए।", options: ["77", "75", "76", "71"], correct: 2 },
+                    { id: 34, text: "Q.34 [{72 ÷ (6 × (3 + 2))} + 5² - 8] × 5 / 97 को सरल करें।", options: ["5", "3", "7", "1"], correct: 3 },
+                    { id: 35, text: "Q.35 3 पुरुष किसी कार्य को 20 दिन में कर सकते हैं। कितने पुरुष उस कार्य को 2 दिन में पूरा करेंगे?", options: ["31", "32", "33", "30"], correct: 3 },
+                    { id: 36, text: "Q.36 एक गोले के आयतन और एक अर्धगोले के संपूर्ण पृष्ठीय क्षेत्रफल का अनुपात 28:3 है। यदि गोले और अर्धगोले की त्रिज्याएँ बराबर हैं, तो गोले का आयतन (घन सेंटीमीटर में) ज्ञात कीजिए। (π = 22/7)", options: ["38,460", "38,208", "38,542", "38,808"], correct: 3 },
+                    { id: 37, text: "Q.37 अनमोल और आयुषी ने मिलकर एक व्यवसाय में ₹46,600 का निवेश किया। वर्ष के अंत में, ₹7,500 के कुल लाभ में से अनमोल का हिस्सा ₹2,700 था। अनमोल का निवेश कितना था?", options: ["17,240", "16,776", "16,080", "18,740"], correct: 1 },
+                    { id: 38, text: "Q.38 यदि 32 और 24 का तृतीयानुपाती x है, तो x का मान कितना होगा?", options: ["18", "20", "16", "17"], correct: 0 },
+                    { id: 39, text: "Q.39 A, B और C एक काम को क्रमशः 3, 8 और 24 दिनों में पूरा कर सकते हैं। एक साथ काम करते हुए, उसी काम का तीन गुना काम करने में उन्हें कितना समय (दिन में) लगेगा?", options: ["18", "6", "7", "12"], correct: 1 },
+                    { id: 40, text: "Q.40 एक व्यक्ति अपनी आय के 60% की बचत करता है। यदि उसका व्यय ₹440 है, तो उसकी आय (₹ में) ज्ञात कीजिए।", options: ["1,140", "264", "1,100", "176"], correct: 2 },
+                    { id: 41, text: "Q.41 यदि x² + 1 = 2x^(2/8), तो (x⁴ - 1) निम्नलिखित में से किसके बराबर होगा?", options: ["2x", "x", "0", "1"], correct: 2 },
+                    { id: 42, text: "Q.42 ΔPMN में, ∠P = 76° है। M और N पर बाह्य कोणों के समद्विभाजक एक दूसरे को बिंदु O पर प्रतिच्छेद करते हैं। ∠MON का अंश में माप कितना है?", options: ["128°", "52°", "38°", "104°"], correct: 1 },
+                    { id: 43, text: "Q.43 यदि cos θ = 12/13 है, तो (1 - sin θ) / (1 + sin θ) का मान ज्ञात कीजिए।", options: ["12/13", "1/25", "1/3", "1/5"], correct: 3 },
+                    { id: 44, text: "Q.44 ₹6,500 की राशि पर वार्षिक रूप से संयोजित 20% वार्षिक चक्रवृद्धि ब्याज की दर से 2 वर्षों में प्राप्त मिश्रधन ज्ञात कीजिए।", options: ["₹9,431", "₹10,274", "₹9,360", "₹8,411"], correct: 2 },
+                    { id: 45, text: "Q.45 एक त्रिभुजाकार मैदान की भुजाएँ 42 cm, 34 cm और 20 cm हैं। सबसे लंबी भुजा के संगत शीर्ष लंब (altitude) की लंबाई कितनी है?", options: ["20 cm", "16 cm", "18 cm", "15 cm"], correct: 1 },
+                    { id: 46, text: "Q.46 चार बच्चों I, J, K और L की औसत आयु 9 वर्ष है और I, J, L, M की औसत आयु 12 वर्ष है। K की आयु 5 वर्ष है। M की आयु (वर्षों में) कितनी है?", options: ["20", "17", "19", "18"], correct: 1 },
+                    { id: 47, text: "Q.47 एक वस्तु को 29% की छूट पर बेचने के बाद प्राप्त लाभ प्रतिशत 4% है, तो वस्तु का मूल्य कितने प्रतिशत बढ़ाकर अंकित किया गया?", options: ["45.31%", "46.48%", "48.51%", "47.05%"], correct: 1 },
+                    { id: 48, text: "Q.48 84 km/hr की चाल से चल रही एक रेलगाड़ी P, समान्तर पटरियों पर समान दिशा में 54 km/hr की चाल से चल रही 447 m लंबी रेलगाड़ी Q को 4.5 मिनट में पूरी तरह से पार कर लेती है। रेलगाड़ी P को विपरीत दिशा में 87 km/hr की चाल से चल रही 287 m लंबी रेलगाड़ी R को पार करने में कितना समय (सेकंड में) लगेगा?", options: ["44", "39", "34", "36"], correct: 3 },
+                    { id: 49, text: "Q.49 मोहन एक घड़ी ₹460 में खरीदता है और उसे ₹483 में बेच देता है। उसका लाभ प्रतिशत ज्ञात कीजिए।", options: ["5.5%", "4%", "5%", "4.7%"], correct: 2 },
+                    { id: 50, text: "Q.50 1/60, 2/20 का कितना प्रतिशत है?", options: ["165%", "160%", "150%", "300%"], correct: 2 }
+                ]
+            },
+            {
+                sectionName: "Reasoning",
+                questions: [
+                    { id: 51, text: "Q.51 दी गई श्रृंखला में प्रश्न-चिन्ह (?) के स्थान पर क्या आएगा? 267 237 209 183 159 ?", options: ["137", "128", "133", "145"], correct: 0 },
+                    { id: 52, text: "Q.52 कथन: कुछ संतरे, आडू हैं। कोई आडू, गाजर नहीं है। निष्कर्ष: (I) कुछ संतरे, गाजर हैं। (II) सभी गाजर, आडू हैं।", options: ["निष्कर्ष (I) और (II) दोनों अनुसरण करते हैं।", "केवल निष्कर्ष (I) अनुसरण करता है।", "न तो निष्कर्ष (I) और न ही (II) अनुसरण करता है।", "केवल निष्कर्ष (II) अनुसरण करता है।"], correct: 2 },
+                    { id: 53, text: "Q.53 अंग्रेजी वर्णमाला क्रम के आधार पर श्रृंखला पूर्ण करें: GMP IOR KQT MSV ?", options: ["OUX", "PVX", "OUY", "QVX"], correct: 0 },
+                    { id: 54, text: "Q.54 सात बॉक्स B, C, D, I, J, K और L, एक के ऊपर एक रखे गए हैं... C के ऊपर केवल I को रखा गया है। C और B के बीच केवल L को रखा गया है। D के नीचे केवल K को रखा गया है। B और I के बीच कितने बॉक्स रखे गए हैं?", options: ["एक", "तीन", "दो", "चार"], correct: 1 },
+                    { id: 55, text: "Q.55 मुकेश बिंदु A से उत्तर दिशा में 14 km, बाएं 9 km, बाएं 17 km, बाएं 13 km, फिर बाएं 3 km चलकर बिंदु P पर रुकता है। बिंदु A पर दोबारा पहुँचने के लिए न्यूनतम दूरी और दिशा क्या होगी?", options: ["पूर्व में 4 km", "पश्चिम में 5 km", "पूर्व में 5 km", "पश्चिम में 4 km"], correct: 3 },
+                    { id: 56, text: "Q.56 असंगत अक्षर-समूह युग्म का चयन करें: IL-EL, MP-IL, OR-KN, PS-LO", options: ["IL-EL", "MP-IL", "OR-KN", "PS-LO"], correct: 0 },
+                    { id: 57, text: "Q.57 हेमंत पूर्व में 3 km, दाएं 5 km, दाएं 6 km, दाएं 5 km, बाएं 8 km चलकर P पर रुकता है। बिंदु A पर वापस पहुँचने के लिए दूरी और दिशा क्या होगी?", options: ["दक्षिण की ओर 5 km", "उत्तर की ओर 7 km", "पूर्व की ओर 11 km", "पश्चिम की ओर 11 km"], correct: 2 },
+                    { id: 58, text: "Q.58 MIST-TIMS-ISMT, HOPE-EOHP-OPHE के समान तर्क वाला विकल्प चुनें:", options: ["WIDE-EIWD-DIWE", "NUMB-NMUB-BMUN", "BUSY-YUBS-USBY", "PUTS-UPTS-SUTP"], correct: 2 },
+                    { id: 59, text: "Q.59 (बाएं) 571842395761 (दाएं) - ऐसी कितनी सम संख्याएँ हैं जिनके तुरंत बाद विषम संख्या है?", options: ["दो", "एक", "तीन से अधिक", "तीन"], correct: 0 },
+                    { id: 60, text: "Q.60 कूट भाषा में 'ROME' -> '1398', 'DEMO' -> '4138' है। 'D' का कूट क्या है?", options: ["1", "4", "3", "8"], correct: 1 },
+                    { id: 61, text: "Q.61 A, B, C, R, S, T और U वृत्ताकार मेज पर बैठे हैं... T के दाएं तीसरे स्थान पर कौन बैठा है?", options: ["C", "T", "A", "U"], correct: 1 },
+                    { id: 62, text: "Q.62 यदि 'A'='÷', 'B'='×', 'C'='+', 'D'='-' है, तो 11 B 22 C 288 A 18 D 50 = ?", options: ["212", "208", "202", "220"], correct: 1 },
+                    { id: 63, text: "Q.63 यदि 'A'='÷', 'B'='×', 'C'='+', 'D'='-' है, तो 21 B 16 C 20 D 26 A 2 = ?", options: ["343", "340", "342", "341"], correct: 0 },
+                    { id: 64, text: "Q.64 कथन: कुछ धान, चावल हैं। कुछ चावल, गेहूँ हैं। निष्कर्ष: (I) कुछ धान, गेहूँ हैं। (II) सभी गेहूँ, चावल हैं।", options: ["केवल निष्कर्ष (II) अनुसरण करता है।", "न तो निष्कर्ष (I) और न ही (II) अनुसरण करता है।", "केवल निष्कर्ष (I) अनुसरण करता है।", "निष्कर्ष (I) और (II) दोनों अनुसरण करते हैं।"], correct: 1 },
+                    { id: 65, text: "Q.65 'O + P @ T - G # V' में O का V से क्या संबंध है?", options: ["माता की बहन", "बहन", "माता की माता", "माता"], correct: 0 },
+                    { id: 66, text: "Q.66 (3, -2, 11) और (46, 2107, 9) के समान संबंध दर्शाने वाला सेट चुनें:", options: ["(38, 1433, 10)", "(34, 1135, 21)", "(33, 1081, 7)", "(25, 607, 17)"], correct: 1 },
+                    { id: 67, text: "Q.67 दी गई श्रृंखला में प्रश्न-चिह्न (?) के स्थान पर क्या आएगा? 2 4 12 24 72 ?", options: ["124", "92", "136", "144"], correct: 3 },
+                    { id: 68, text: "Q.68 'nail post fish' -> 'pl mg qn', 'fish urn knife' -> 'ix pl ko'. 'fish' का कूट क्या होगा?", options: ["mg", "qn", "pl", "ix"], correct: 2 },
+                    { id: 69, text: "Q.69 (बाएँ) 593 784 358 631 296 (दाएँ) - सबसे बड़ी संख्या के तीसरे अंक को सबसे छोटी संख्या के दूसरे अंक में जोड़ने पर क्या प्राप्त होगा?", options: ["10", "17", "14", "13"], correct: 3 },
+                    { id: 70, text: "Q.70 (बाएं) 313963411569968975662 (दाएं) - ऐसे कितने सम अंक हैं, जिनके ठीक पहले पूर्ण वर्ग और ठीक बाद सम अंक है?", options: ["1", "2", "4", "3"], correct: 0 },
+                    { id: 71, text: "Q.71 असंगत अक्षर-समूह चुनें: GMJ, IOL, PVS, CIE", options: ["GMJ", "IOL", "PVS", "CIE"], correct: 3 },
+                    { id: 72, text: "Q.72 G के बाईं ओर से गिनने पर A और G के बीच कितने व्यक्ति बैठे हैं?", options: ["एक", "तीन", "चार", "दो"], correct: 2 },
+                    { id: 73, text: "Q.73 SDFH:VYIC :: EJRN:HEUI :: NUAY:?", options: ["QPDT", "QPYU", "QWET", "QSER"], correct: 0 },
+                    { id: 74, text: "Q.74 GKN19 HLO26 IMP33 JNQ40 ?", options: ["KOS47", "KOR48", "KOR47", "KOS48"], correct: 2 },
+                    { id: 75, text: "Q.75 यदि '+'='-', '-'='×', '×'='÷', '÷'='+' है, तो 17 ÷ 147 + 362 × 2 = ?", options: ["691", "699", "695", "697"], correct: 3 },
+                    { id: 76, text: "Q.76 C के दाईं ओर दूसरे स्थान पर कौन बैठा है?", options: ["D", "J", "K", "I"], correct: 0 },
+                    { id: 77, text: "Q.77 (बाएं) 742 912 853 657 154 (दाएं) - अवरोही क्रम में व्यवस्थित करने पर कितनों का स्थान अपरिवर्तित रहेगा?", options: ["चार", "तीन", "दो", "एक"], correct: 2 },
+                    { id: 78, text: "Q.78 EFJL:HKMQ :: QZVF:TEYK :: ZOEU:?", options: ["CTZS", "CTHZ", "CTYU", "CGFR"], correct: 1 },
+                    { id: 79, text: "Q.79 834 840 848 ? 870 884 के स्थान पर क्या आएगा?", options: ["855", "858", "856", "854"], correct: 1 },
+                    { id: 80, text: "Q.80 रमन ऊपर से 31वें और नीचे से 12वें स्थान पर है। कुल कितने विद्यार्थी हैं?", options: ["41", "40", "43", "42"], correct: 3 }
+                ]
+            },
+            {
+                sectionName: "General Awareness",
+                questions: [
+                    { id: 81, text: "Q.81 भारत ने समुद्री रक्षा बुनियादी ढांचे को उन्नत बनाने के लिए 'हॉक आई 360' तकनीक हासिल करने हेतु मई 2025 में किस देश के साथ $131 मिलियन का सौदा किया?", options: ["दक्षिण अफ्रीका", "संयुक्त राज्य अमेरिका", "जर्मनी", "न्यूज़ीलैंड"], correct: 1 },
+                    { id: 82, text: "Q.82 'जीनोमइंडिया' प्रोजेक्ट ने अप्रैल 2025 में WGS पूरा कर लिया है। यह किस वर्ष शुरू किया गया था?", options: ["2020", "2014", "2019", "2023"], correct: 0 },
+                    { id: 83, text: "Q.83 राष्ट्रीय नर्स दिवस 2025 की थीम 'Our Nurses. Our Future. Caring for nurses strengthens economies' थी। यह कब मनाया गया?", options: ["7 अगस्त", "12 मई", "7 जून", "6 जुलाई"], correct: 1 },
+                    { id: 84, text: "Q.84 MEE 2020-2025 में किन दो राष्ट्रीय उद्यानों ने 92.97% का उच्चतम स्कोर हासिल किया?", options: ["बांदीपुर और कान्हा", "एराविकुलम और दाचीगाम", "गिर और काजीरंगा", "पेरियार और सुंदरबन"], correct: 3 },
+                    { id: 85, text: "Q.85 रग्बी लीग के किस दिग्गज खिलाड़ी को खेल के 130-साल के इतिहास में नाइट्स (knighthood) की उपाधि प्राप्त हुई?", options: ["बिली बोस्टन", "केविन सिनफील्ड", "मार्टिन ऑफियाह", "एलेरी हेनले"], correct: 1 },
+                    { id: 86, text: "Q.86 प्रधानमंत्री ने वर्ष 2025 में किस शहर में वन्यजीवों के लिए नेशनल रेफरल सेंटर की आधारशिला रखी?", options: ["पुणे", "जूनागढ़", "अहमदाबाद", "वडोदरा"], correct: 1 },
+                    { id: 87, text: "Q.87 RBI द्वारा परियोजना वित्त प्रावधान हेतु आसान मानदंड कब से प्रभावी होंगे?", options: ["1 अक्टूबर 2025", "1 नवंबर 2025", "1 अगस्त 2025", "1 सितंबर 2025"], correct: 0 },
+                    { id: 88, text: "Q.88 सामाजिक सेवा (पूर्वोत्तर भारत) में योगदान हेतु किसे 2025 में पद्मश्री प्राप्त हुआ?", options: ["बीनालक्ष्मी नेपराम", "जुमदे योमगाम", "आनंद कुमार", "किरण मजूमदार-शॉ"], correct: 1 },
+                    { id: 89, text: "Q.89 मई 2025 में राष्ट्रपति द्वारा दिए जाने वाले राष्ट्रीय फ्लोरेंस नाइटिंगेल पुरस्कार किसे दिए जाते हैं?", options: ["डॉक्टरों", "शिक्षण संस्थानों", "नर्सिंग पेशेवरों", "शिक्षण पेशेवर"], correct: 2 },
+                    { id: 90, text: "Q.90 भारत में स्थापित नवीकरणीय ऊर्जा क्षमता 2014-15 में 64.04 W/व्यक्ति से बढ़कर 2024-25 में किस स्तर तक पहुँच गई?", options: ["98.63 वाट", "156.31 वाट", "110.36 वाट", "85.21 वाट"], correct: 1 },
+                    { id: 91, text: "Q.91 संयुक्त राष्ट्र द्वारा घोषित 12 अप्रैल 2025 को पहली बार कौन-सा अंतर्राष्ट्रीय दिवस मनाया गया?", options: ["अंतर्राष्ट्रीय स्वच्छ ऊर्जा दिवस", "सभ्यताओं के बीच संवाद के लिए अंतर्राष्ट्रीय दिवस", "अंतर्राष्ट्रीय मानव अंतरिक्ष उड़ान दिवस", "अंतर्राष्ट्रीय पादप स्वास्थ्य दिवस"], correct: 1 },
+                    { id: 92, text: "Q.92 जनवरी 2025 में किस राज्य के उच्च न्यायालय ने लिव-इन रिलेशनशिप हेतु कानूनी अनुबंध अनिवार्य करने का आदेश दिया?", options: ["महाराष्ट्र", "गोवा", "गुजरात", "राजस्थान"], correct: 2 },
+                    { id: 93, text: "Q.93 जनवरी 2025 में किस संगठन को स्वास्थ्य श्रेणी में 2025 'Zayed Sustainability Prize' प्रदान किया गया?", options: ["पेरिविंकल टेक्नोलॉजीज", "लास्ट माइल हेल्थ", "PATH", "डॉक्टर्स विदाउट बॉर्डर्स"], correct: 0 },
+                    { id: 94, text: "Q.94 2025 में 'Laureus World Team of the Year' पुरस्कार किस टीम ने जीता?", options: ["लॉस एंजिल्स लेकर्स", "रियल मैड्रिड", "बार्सिलोना", "स्पेन ओलंपिक फुटबॉल टीम"], correct: 3 },
+                    { id: 95, text: "Q.95 ICRA के अनुसार, भारत के सामान्य बीमा क्षेत्र में FY26 में कितने प्रतिशत वृद्धि का अनुमान है?", options: ["7.7%", "5.7%", "8.7%", "6.7%"], correct: 2 },
+                    { id: 96, text: "Q.96 किस भारतीय गेंदबाज ने 25 विकेट लेकर IPL 2025 पर्पल कैप जीती?", options: ["अर्शदीप सिंह", "जसप्रीत बुमराह", "प्रसिद्ध कृष्णा", "युजवेंद्र चहल"], correct: 2 },
+                    { id: 97, text: "Q.97 मई 2025 में ULLAS योजना के तहत कौन-सा राज्य भारत का पहला पूर्ण साक्षर राज्य बना?", options: ["केरल", "गुजरात", "गोवा", "मिजोरम"], correct: 3 },
+                    { id: 98, text: "Q.98 2025 में डिजिटल प्रतिस्पर्धा कानून पर विशेषज्ञ समिति का नेतृत्व किसने किया?", options: ["मनोज जोशी", "नंदन नीलेकणि", "मनोज गोविल", "अश्विनी वैष्णव"], correct: 2 },
+                    { id: 99, text: "Q.99 जनवरी 2025 में MOSPI ने डेटा इनोवेशन लैब हेतु किस संस्थान के साथ MoU पर हस्ताक्षर किए?", options: ["IIIT-हैदराबाद", "NIT दुर्गापुर", "IIIT-दिल्ली", "NIT वारंगल"], correct: 2 },
+                    { id: 100, text: "Q.100 वीडियो के माध्यम से खेल प्रतिभाओं की पहचान करने के लिए जून 2025 में किस ऐप की घोषणा की गई?", options: ["SAI कनेक्ट ऐप", "खेलो इंडिया ऐप", "TOPS टैलेंट ऐप", "स्पोर्ट्स टैलेंट सर्च ऐप"], correct: 3 }
+                ]
+            }
+        ];
+
+        let currentSectionIndex = 0;
+        let currentQuestionIndex = 0;
+        let userAnswers = {}; 
+        let reviewStatus = {}; 
+
+        function renderSectionTabs() {
+            const container = document.getElementById("section-tabs");
+            container.innerHTML = "";
+            examData.forEach((sec, idx) => {
+                const btn = document.createElement("button");
+                btn.className = `section-btn ${idx === currentSectionIndex ? 'active' : ''}`;
+                btn.innerText = sec.sectionName;
+                btn.onclick = () => switchSection(idx);
+                container.appendChild(btn);
+            });
+        }
+
+        function switchSection(index) {
+            currentSectionIndex = index;
+            currentQuestionIndex = 0;
+            renderSectionTabs();
+            loadQuestion();
+            renderPalette();
+        }
+
+        function loadQuestion() {
+            const currentQ = examData[currentSectionIndex].questions[currentQuestionIndex];
+            document.getElementById("question-text").innerText = currentQ.text;
+            
+            const optContainer = document.getElementById("options-container");
+            optContainer.innerHTML = "";
+
+            const key = `${currentSectionIndex}-${currentQuestionIndex}`;
+            const selectedOpt = userAnswers[key];
+
+            currentQ.options.forEach((opt, idx) => {
+                const label = document.createElement("label");
+                label.className = "option-item";
+                label.innerHTML = `
+                    <input type="radio" name="opt" value="${idx}" ${selectedOpt === idx ? 'checked' : ''}>
+                    ${String.fromCharCode(65 + idx)}. ${opt}
+                `;
+                optContainer.appendChild(label);
+            });
+        }
+
+        function renderPalette() {
+            const palette = document.getElementById("palette-grid");
+            palette.innerHTML = "";
+            const totalQ = examData[currentSectionIndex].questions.length;
+
+            for(let i = 0; i < totalQ; i++) {
+                const btn = document.createElement("div");
+                const key = `${currentSectionIndex}-${i}`;
+                
+                let btnClass = "p-btn";
+                if(i === currentQuestionIndex) btnClass += " active";
+                if(userAnswers[key] !== undefined) btnClass += " answered";
+                if(reviewStatus[key]) btnClass += " review";
+
+                btn.className = btnClass;
+                btn.innerText = i + 1;
+                btn.onclick = () => { currentQuestionIndex = i; loadQuestion(); renderPalette(); };
+                palette.appendChild(btn);
+            }
+        }
+
+        function saveAndNext() {
+            const selected = document.querySelector('input[name="opt"]:checked');
+            const key = `${currentSectionIndex}-${currentQuestionIndex}`;
+            
+            if(selected) {
+                userAnswers[key] = parseInt(selected.value);
+            }
+            
+            if(currentQuestionIndex < examData[currentSectionIndex].questions.length - 1) {
+                currentQuestionIndex++;
+            }
+            loadQuestion();
+            renderPalette();
+        }
+
+        function clearResponse() {
+            const key = `${currentSectionIndex}-${currentQuestionIndex}`;
+            delete userAnswers[key];
+            delete reviewStatus[key];
+            loadQuestion();
+            renderPalette();
+        }
+
+        function markForReview() {
+            const key = `${currentSectionIndex}-${currentQuestionIndex}`;
+            reviewStatus[key] = true;
+            saveAndNext();
+        }
+
+        // Initialize Exam App
+        renderSectionTabs();
+        loadQuestion();
+        renderPalette();
+    </script>
+</body>
+</html>
