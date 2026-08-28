@@ -316,13 +316,24 @@
             const container = document.getElementById('options-container');
             container.innerHTML = '';
             q.options.forEach((opt, optIdx) => {
-                const isChecked = userAnswers[currentSubject][index] === optIdx ? 'checked' : '';
-                container.innerHTML += `
-                    <label>
-                        <input type="radio" name="opt" value="${optIdx}" ${isChecked}>
-                        ${opt}
-                    </label>
+                const isChecked = userAnswers[currentSubject][index] === optIdx;
+                const label = document.createElement('label');
+                if (isChecked) label.classList.add('selected-option');
+                
+                label.innerHTML = `
+                    <input type="radio" name="opt" value="${optIdx}" ${isChecked ? 'checked' : ''}>
+                    <span>${opt}</span>
                 `;
+                
+                // Touch/Click Event for Mobile
+                label.addEventListener('click', function () {
+                    document.querySelectorAll('.options-container label').forEach(l => l.classList.remove('selected-option'));
+                    this.classList.add('selected-option');
+                    const radio = this.querySelector('input[type="radio"]');
+                    if (radio) radio.checked = true;
+                });
+
+                container.appendChild(label);
             });
 
             updatePaletteUI();
@@ -441,37 +452,5 @@ Final Score: ${totalMarks.toFixed(2)} Marks`);
         // Initial Load
         loadQuestion(0); 
     <script>
-  // ================= MOBILE TOUCH & TICK COLOR FIX =================
-  document.addEventListener('DOMContentLoaded', function () {
-    // Page ke har option par click/tap Event Listener lagane ke liye
-    document.addEventListener('click', function (e) {
-      
-      // Agar user ne kisi option ya label par tap kiya hai
-      let optionBox = e.target.closest('label') || e.target.closest('.option') || e.target.closest('.option-label');
-      
-      if (optionBox) {
-        // Current question ke saare options se 'selected' class hatao
-        let questionBlock = optionBox.closest('.question') || optionBox.closest('.question-box') || document;
-        questionBlock.querySelectorAll('label, .option, .option-label').forEach(el => {
-          el.classList.remove('selected');
-        });
-
-        // Current tapped option me 'selected' class add karo
-        optionBox.classList.add('selected');
-
-        // Target Radio Button ko forced Check karo (Mobile Browser Fix)
-        let radio = optionBox.querySelector('input[type="radio"]');
-        if (!radio && optionBox.getAttribute('for')) {
-          radio = document.getElementById(optionBox.getAttribute('for'));
-        }
-        if (radio) {
-          radio.checked = true;
-        }
-      }
-    });
-  });
-  // ==================================================================
-
-  // ... Aapka Baaki Purana JavaScript Code Yahan Rahega ...
 </body>
 </html>
