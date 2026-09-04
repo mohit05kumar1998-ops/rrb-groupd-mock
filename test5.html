@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RRB Group D CBT Exam Portal (Subject Wise - 100 Questions)</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; user-select: none; }
+        body { background-color: #f0f0f0; height: 100vh; display: flex; flex-direction: column; }
+        
+        /* Top Header */
+        header { background: #337ab7; color: white; padding: 10px 20px; font-size: 18px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Candidate Info Bar */
+        .sub-header { background: #e8e8e8; padding: 8px 20px; border-bottom: 1px solid #ccc; display: flex; justify-content: space-between; align-items: center; }
+        .candidate-info { display: flex; align-items: center; gap: 15px; }
+        .user-img { width: 40px; height: 40px; border-radius: 50%; background: #ccc; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #555; }
+        .timer-box { background: #d9534f; color: white; padding: 6px 15px; border-radius: 4px; font-weight: bold; font-size: 16px; }
+
+        /* Subject Navigation Tabs */
+        .subject-tabs { background: #fff; border-bottom: 2px solid #337ab7; display: flex; gap: 2px; padding-left: 10px; overflow-x: auto; }
+        .tab-btn { background: #e0e0e0; border: none; padding: 10px 18px; cursor: pointer; font-weight: bold; font-size: 13px; color: #333; border-radius: 5px 5px 0 0; white-space: nowrap; }
+        .tab-btn.active { background: #337ab7; color: white; }
+
+        /* Main Workspace */
+        .workspace { display: flex; flex: 1; overflow: hidden; }
+        
+        /* Left Section: Question Area */
+        .question-area { width: 75%; background: white; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid #ccc; overflow-y: auto; }
+        .q-header { border-bottom: 2px solid #337ab7; padding-bottom: 8px; margin-bottom: 15px; font-weight: bold; color: #337ab7; display: flex; justify-content: space-between; }
+        .q-text { font-size: 16px; font-weight: bold; margin-bottom: 20px; color: #222; white-space: pre-line; }
+        
+        /* Options Selection Styling */
+        .options-container label { 
+            display: flex; 
+            align-items: center;
+            margin-bottom: 12px; 
+            padding: 12px 15px; 
+            background: #f9f9f9; 
+            border: 2px solid #ddd; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        .options-container label:hover { background: #eef5fc; border-color: #337ab7; }
+        .options-container input[type="radio"] { margin-right: 12px; transform: scale(1.2); }
+
+        /* Active Selected Option Color */
+        .options-container label.selected-option,
+        .options-container label:has(input[type="radio"]:checked) {
+            background-color: #d1e7dd !important;
+            border-color: #0f5132 !important;
+            color: #0f5132 !important;
+            font-weight: bold;
+        }
+
+        /* Responsive Layout for Mobile */
+        @media (max-width: 768px) {
+            .workspace { flex-direction: column; overflow-y: auto; }
+            .question-area { width: 100%; border-right: none; }
+            .palette-area { width: 100%; }
+        }
+
+        /* Bottom Controls */
+        .action-bar { border-top: 1px solid #ddd; padding-top: 15px; display: flex; justify-content: space-between; background: white; flex-wrap: wrap; gap: 10px; }
+        .btn-group-left, .btn-group-right { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn { padding: 10px 18px; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 13px; text-transform: uppercase; -webkit-tap-highlight-color: transparent; }
+        .btn-save { background: #5cb85c; color: white; }
+        .btn-clear { background: #f0ad4e; color: white; }
+        .btn-review { background: #8e44ad; color: white; } /* Purple */
+        .btn-submit { background: #d9534f; color: white; }
+
+        /* Right Section: Palette */
+        .palette-area { width: 25%; background: #f4f6f9; padding: 15px; display: flex; flex-direction: column; }
+        .palette-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px; margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 15px; }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .badge { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; color: white; border-radius: 3px; font-weight: bold; }
+        
+        /* TCS PALETTE STATUS COLOR CODES */
+        .status-answered, button.q-btn.status-answered { background-color: #5cb85c !important; color: white !important; border-color: #4cae4c !important; }
+        .status-not-answered, button.q-btn.status-not-answered { background-color: #d9534f !important; color: white !important; border-color: #d43f3a !important; }
+        .status-review, button.q-btn.status-review { background-color: #8e44ad !important; color: white !important; border-color: #732d91 !important; } /* PURPLE */
+        .status-not-visited, button.q-btn.status-not-visited { background-color: #fff !important; color: #333 !important; border: 1px solid #ccc !important; }
+
+        .q-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; max-height: 350px; overflow-y: auto; }
+        .q-btn { width: 38px; height: 38px; border: 1px solid #ccc; background: white; font-weight: bold; border-radius: 4px; cursor: pointer; }
+        .q-btn.active { outline: 3px solid #337ab7; outline-offset: -1px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>RRB Group D Online CBT Examination</div>
+    </header>
+
+    <div class="sub-header">
+        <div class="candidate-info">
+            <div class="user-img">User</div>
+            <div>
+                <div style="font-weight: bold; font-size: 14px;">Candidate Name: Roll No. 102938</div>
+                <div style="font-size: 12px; color: #555;">Subject: Full Length Mock Test</div>
+            </div>
+        </div>
+        <div class="timer-box">Time Left: <span id="timer-display">90:00</span></div>
+    </div>
+
+    <!-- Subject Tabs -->
+    <div class="subject-tabs">
+        <button class="tab-btn active" onclick="switchSubject('science', event)">General Science</button>
+        <button class="tab-btn" onclick="switchSubject('maths', event)">Mathematics</button>
+        <button class="tab-btn" onclick="switchSubject('reasoning', event)">Reasoning</button>
+        <button class="tab-btn" onclick="switchSubject('ga', event)">General Awareness</button>
+    </div>
+
+    <!-- Workspace -->
+    <div class="workspace">
+        
+        <div class="question-area">
+            <div>
+                <div class="q-header">
+                    <span id="question-number">Question No. 1</span>
+                    <span id="subject-title" style="font-size: 13px; color: #666;">General Science</span>
+                </div>
+                <div class="q-text" id="question-text">Loading question...</div>
+                <div class="options-container" id="options-container"></div>
+            </div>
+
+            <div class="action-bar">
+                <div class="btn-group-left">
+                    <button class="btn btn-clear" onclick="clearOption()">Clear Response</button>
+                    <button class="btn btn-review" onclick="markForReview()">Mark for Review & Next</button>
+                </div>
+                <div class="btn-group-right">
+                    <button class="btn btn-save" onclick="saveAndNext()">Save & Next</button>
+                    <button class="btn btn-submit" onclick="submitTest()">Submit Test</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="palette-area">
+            <div class="palette-legend">
+                <div class="legend-item"><span class="badge status-answered" id="count-answered">0</span> Answered</div>
+                <div class="legend-item"><span class="badge status-not-answered" id="count-not-answered">0</span> Not Answered</div>
+                <div class="legend-item"><span class="badge status-not-visited" id="count-not-visited">0</span> Not Visited</div>
+                <div class="legend-item"><span class="badge status-review" id="count-review">0</span> Marked for Review</div>
+            </div>
+
+            <div style="font-weight: bold; font-size: 13px; margin-bottom: 10px;">Question Palette:</div>
+            <div class="q-grid" id="question-palette"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const examData = {
+            science: {
+                name: "General Science",
+                questions: [
+                    { id: 1, text: "Q.1 पौधों में वृद्धि केवल विशिष्ट क्षेत्रों में ही क्यों होती है?", options: ["गुरुत्वाकर्षण कुछ क्षेत्रों में वृद्धि को रोकता है", "जल केवल पौधे के ऊपरी भाग तक ही पहुंचता है।", "पौधे के केवल कुछ भागों को ही सूर्य का प्रकाश प्राप्त होता है।", "मेरिस्टेमेटिक ऊतक केवल विशिष्ट क्षेत्रों में ही स्थित होता है।"], correct: 3 },
+                    { id: 2, text: "Q.2 पादप कोशिका भित्ति मुख्य रूप से ______ से बनी होती है।", options: ["N-ऐसीटिल ग्लूकोसैमीन (N-Acetyl glucosamine)", "सैलुलोज़", "सबेरिन", "काईटिन"], correct: 1 },
+                    { id: 3, text: "Q.3 निम्नलिखित में से कौन-सी धातु आसवन द्वारा शुद्ध की जाती है?", options: ["लोहा", "चाँदी", "ताँबा", "जस्ता"], correct: 3 },
+                    { id: 4, text: "Q.4 निम्नलिखित में से किस प्रक्रिया में पोषणनाल से अवशोषित पदार्थों का विभिन्न अंगों तक परिवहन होता है जहां उनका उपयोग जटिल पदार्थ के निर्माण हेतु किया जाता है?", options: ["प्रकाश संश्लेषण", "स्वांगीकरण", "वाष्पोत्सर्जन", "पाचन"], correct: 1 },
+                    { id: 5, text: "Q.5 एथेनॉल (Ethanol) को सांद्र सल्फ्यूरिक अम्ल की अधिकता में 443 K पर गर्म करने पर एथीन (ethene) प्राप्त होता है। होने वाला रासायनिक परिवर्तन ______ होगा।", options: ["निर्जलीकरण", "अपचयन", "हैलोजनन", "ऑक्सीकरण"], correct: 0 },
+                    { id: 6, text: "Q.6 15Ω और 50Ω के दो प्रतिरोधक 12V की बैटरी के साथ श्रेणीक्रम में जुड़े हैं। परिपथ में कितनी धारा प्रवाहित होगी?", options: ["0.45 A", "0.6 A", "0.65 A", "0.5 A"], correct: 1 },
+                    { id: 7, text: "Q.7 क्या होता है जब एक पेंडुलम बॉब अपनी औसत स्थिति से चरम स्थिति तक झूलता है?", options: ["स्थितिज ऊर्जा घटती है, गतिज ऊर्जा बढ़ती है", "गतिज और स्थितिज ऊर्जा दोनों बढ़ती हैं", "स्थितिज ऊर्जा बढ़ती है, गतिज ऊर्जा घटती है", "कुल ऊर्जा घटती है"], correct: 2 },
+                    { id: 8, text: "Q.8 प्रजनन स्वास्थ्य में, गर्भनिरोध का क्या उद्देश्य है?", options: ["बच्चों को स्वस्थ बनाना", "अधिक बच्चे पैदा करना", "अनियोजित गर्भधारण को रोकना", "जुड़वां बच्चे पैदा करना"], correct: 2 },
+                    { id: 9, text: "Q.9 हवा से तिरछी दिशा में चलकर काँच के एक स्लैब पर पड़ने वाली प्रकाश की किरण पर विचार करें। निम्नलिखित में से कौन सा/से कथन सत्य है/हैं?\n(i) आपतन कोण अपवर्तन कोण से छोटा होता है।\n(ii) आपतन कोण, निर्गमन कोण से बड़ा होता है।\n(iii) जैसे ही प्रकाश की किरण वायु से कांच में प्रवेश करती है, प्रकाश की चाल कम हो जाती है।\n(iv) आपतित किरण और निर्गत किरण एक दूसरे के समान्तर होती हैं।", options: ["(i) और (iv) दोनों", "(iii) और (iv) दोनों", "(ii) और (iii) दोनों", "(i) और (ii) दोनों"], correct: 1 },
+                    { id: 10, text: "Q.10 अभिकथन और कारण नामक निम्नलिखित दो कथनों के संबंध में सही विकल्प का चयन कीजिए।\nअभिकथनः ध्वनि तरंगें, अयांत्रिक तरंगें हैं।\nकारणः ध्वनि तरंगों को संचरण के लिए एक भौतिक माध्यम की आवश्यकता होती है।", options: ["अभिकथन और कारण दोनों ही सत्य हैं और कारण, अभिकथन की सही व्याख्या है।", "अभिकथन असत्य है लेकिन कारण सत्य है।", "अभिकथन और कारण दोनों ही असत्य हैं।", "अभिकथन सत्य है लेकिन कारण असत्य है।"], correct: 1 },
+                    { id: 11, text: "Q.11 एक मुर्गीपालक ऐसे पक्षी चाहता है जो कम चारा खाएँ, ज़्यादा गर्मी सहन कर सकें और अच्छी गुणवत्ता वाले चूज़े पैदा करें। उसे कौन सी रणनीति अपनानी चाहिए?", options: ["मछली पालन की ओर रुख", "केवल देशी पक्षियों का उपयोग करें", "पक्षियों को दिन में दो बार खाना खिलाएँ", "विदेशी और स्थानीय मुर्गीपालन का संकरण"], correct: 3 },
+                    { id: 12, text: "Q.12 थॉमसन के परमाणु मॉडल के अनुसार निम्नलिखित में से कौन-सा कथन सत्य है?", options: ["इलेक्ट्रॉन धनात्मक आवेशित गोले में यादृच्छिक रूप से प्रसारित होते हैं।", "इलेक्ट्रॉन कक्षाओं में स्थिर होते हैं।", "इलेक्ट्रॉन नाभिक में संकेंद्रित होते हैं।", "इलेक्ट्रॉन, न्यूट्रॉनों से संलग्न होते हैं।"], correct: 0 },
+                    { id: 13, text: "Q.13 निम्नलिखित में से कौन-सा/से कथन सही है/हैं?\na. घ्राण सूचकों का उपयोग किसी यौगिक की अम्लीय या क्षारीय प्रकृति की जांच के लिए किया जाता है।\nb. लौंग का तेल एक घ्राण सूचक है।\nc. लौंग के तेल का उपयोग किसी भी यौगिक की शुद्धता की जांच के लिए किया जाता है।", options: ["केवल a", "केवल a और c", "केवल a और b", "a, b और c"], correct: 2 },
+                    { id: 14, text: "Q.14 आर्किमिडीज का सिद्धांत कहता है कि जब कोई पिंड किसी तरल पदार्थ में डूबा होता है, तो उसे ______ का अनुभव होता है।", options: ["पिंड द्वारा विस्थापित द्रव के भार के बराबर नीचे की ओर बल", "इसके भार में कोई परिवर्तन नहीं", "पिंड के भार के बराबर ऊपर की ओर बल", "पिंड द्वारा विस्थापित द्रव के भार के बराबर ऊपर की ओर बल"], correct: 3 },
+                    { id: 15, text: "Q.15 निम्नलिखित में से कौन-सा कथन सबसे अच्छे ढंग से बताता है कि हार्मोनल गर्भनिरोधक गोलियों के दुष्प्रभाव क्यों हो सकते हैं?", options: ["वे शुक्राणु को यंत्रवत् अंडे तक पहुंचने से रोकती हैं।", "वे शरीर की प्रतिरक्षा प्रणाली में हस्तक्षेप करती हैं।", "वे प्राकृतिक हार्मोनल संतुलन को बाधित करती हैं, अन्य शारीरिक कार्यों को प्रभावित करती हैं।", "वे अंडाशय के अंदर अंडे को नष्ट कर देती हैं।"], correct: 2 },
+                    { id: 16, text: "Q.16 उस तत्व की पहचान कीजिए, जो प्रकृति में अणु के रूप में विद्यमान नहीं होता है?", options: ["आयोडीन", "हाइड्रोजन", "क्लोरीन", "हीलियम"], correct: 3 },
+                    { id: 17, text: "Q.17 निम्नलिखित में से कौन-सा कथन ठीक प्रकार से वर्णन करता है कि ठोसों और द्रवों की तुलना में गैसों को आसानी से संपीडित किया जा सकता है?", options: ["गैसों का द्रव्यमान और घनत्व उच्च होता है।", "गैसों के कण शिथिल रूप से संकुलित होते हैं और उनमें अंतराण्विक अंतराल अधिक होते हैं।", "गैसों की गतिज ऊर्जा निम्न होती है।", "गैसें स्थान नहीं घेरतीं है।"], correct: 1 },
+                    { id: 18, text: "Q.18 निम्नलिखित में से कौन-सा, यौन संचारित रोग जीवाणु (bacterium) के कारण होता है?", options: ["HIV-एड्स (HIV-AIDS)", "सुजाक (Gonorrhoea)", "आंत्र ज्वर (Typhoid)", "मस्सा (Warts)"], correct: 1 },
+                    { id: 19, text: "Q.19 एक गोलीय लेंस की वृत्ताकार बाह्य रेखा (circular outline) के प्रभावी व्यास को क्या कहते हैं?", options: ["प्रकाशिक केंद्र (Optical centre)", "वक्रता त्रिज्या (Radius of curvature)", "फोकस दूरी (Focal length)", "द्वारक (Aperture)"], correct: 3 },
+                    { id: 20, text: "Q.20 निम्नलिखित में से कौन-सा/से, बड़े बांधों का परिणाम नहीं है/हैं?", options: ["वनरोपण", "सामाजिक समस्याएं", "निर्वनीकरण", "आर्थिक समस्याएं"], correct: 0 },
+                    { id: 21, text: "Q.21 कार्बन यौगिकों के संदर्भ में, 'शाखित श्रृंखला' संरचना की क्या विशेषता है?", options: ["कार्बन परमाणु एक बंद वलय संरचना बनाते हैं।", "कार्बन परमाणु एक सतत, सीधी रेखा में व्यवस्थित होते हैं।", "कार्बन परमाणु चार अलग-अलग परमाणुओं से बंधे होते हैं।", "कार्बन परमाणु मुख्य कार्बन श्रृंखला से जुड़े होते हैं और पार्श्व समूह बनाते हैं।"], correct: 3 },
+                    { id: 22, text: "Q.22 जब एथीन, ब्रोमीन के साथ अभिक्रिया करता है, तो किस उत्पाद का निर्माण होता है?", options: ["एथेनॉल", "1,2-डाइब्रोमोएथेन", "ब्रोमोएथेन", "एथेन"], correct: 1 },
+                    { id: 23, text: "Q.23 निम्नलिखित में से कौन-सा गति समीकरण, कण के अंतिम वेग से स्वतंत्र है?", options: ["v = ut + a", "v² - u² = 2as", "v = u + at", "s = ut + ½ at²"], correct: 3 },
+                    { id: 24, text: "Q.24 कम द्रव्यमान और उच्च वेग वाली गोली, समान चाल से फेंके गए भारी पत्थर की तुलना में लक्ष्य को अधिक गहराई तक भेद सकती है, क्योंकि", options: ["यह अधिक तीक्ष्ण होती है", "इसका द्रव्यमान अधिक होता है", "यह आकार में छोटी होती है", "इसका जड़त्व कम होता है"], correct: 3 },
+                    { id: 25, text: "Q.25 निम्नलिखित में से कौन-सा किसी पदार्थ का अभिलाक्षणिक गुणधर्म (characteristic property) है?", options: ["धारा", "प्रतिरोध", "वोल्टता", "प्रतिरोधकता"], correct: 3 }
+                ]
+            },
+            maths: {
+                name: "Mathematics",
+                questions: [
+                    { id: 26, text: "Q.26 एक धातु छड़ को तीन भागों, A, B और C, में विभाजित किया गया है। A और B की लंबाइयों का अनुपात 4 : 8 है, और C और B की लंबाइयों का अनुपात 10 : 18 है। यदि A और C की लंबाइयों के बीच का अंतर 48 cm है, तो धातु छड़ की कुल लंबाई (cm में) ज्ञात कीजिए।", options: ["1782", "1176", "1798", "1764"], correct: 1 },
+                    { id: 27, text: "Q.27 एक व्यापारी 80 पेन ₹8 प्रति पेन की दर से खरीदता है। वह उनमें से 60 पेन ₹12 प्रति पेन की दर से बेचता है और शेष पेन 25% की हानि पर बेचता है। कुल लाभ या हानि ज्ञात कीजिए।", options: ["₹240 की हानि", "₹200 का लाभ", "₹200 की हानि", "₹210 का लाभ"], correct: 1 },
+                    { id: 28, text: "Q.28 एक शिविर में 12 दिनों के लिए 48 व्यक्तियों का भोजन है। यदि शिविर में व्यक्तियों की संख्या बढ़ाकर 72 कर दी जाए, तो वही भोजन कितने दिनों में समाप्त हो जाएगा?", options: ["8", "11", "7", "6"], correct: 0 },
+                    { id: 29, text: "Q.29 ((342 ÷ 19 × 306 ÷ 17) ÷ 36 × 6) + (60 ÷ 5 × 2 - 12) का सरलीकृत मान ज्ञात करें।", options: ["76", "66", "56", "46"], correct: 1 },
+                    { id: 30, text: "Q.30 आयत ABCD के अंदर कोई बिंदु P है। यदि PA = 79 cm, PB = 61 cm और PC = 17 cm, तो PD की लंबाई (cm में) कितनी है?", options: ["54", "53", "57", "48"], correct: 1 },
+                    { id: 31, text: "Q.31 लाल, हरे और गुलाबी टोकन वाले एक बैग में, लाल और हरे टोकन का अनुपात 9 : 6 था, जबकि गुलाबी और लाल टोकन का अनुपात 18 : 16 था। हरे और गुलाबी टोकन का अनुपात कितना था?", options: ["14 : 31", "15 : 23", "16 : 27", "17 : 28"], correct: 2 },
+                    { id: 32, text: "Q.32 ज़मीन पर एक बिंदु, एक इमारत के आधार से उसकी ऊँचाई के √3 गुना के बराबर दूरी पर है। बिंदु को इमारत के शीर्ष और ज़मीन से मिलाने वाली रेखा के बीच बनने वाला कोण (डिग्री में) कितना है?", options: ["60°", "45°", "90°", "30°"], correct: 3 },
+                    { id: 33, text: "Q.33 उस बैंक में ₹95,950 की जमा राशि पर अर्जित वार्षिक ब्याज कितना होगा जो 9% वार्षिक दर से साधारण ब्याज का भुगतान करता है?", options: ["₹8,855.50", "₹8,635.50", "₹8,455.50", "₹8,035.50"], correct: 1 },
+                    { id: 34, text: "Q.34 यदि पारुल और उसकी माता की वर्तमान आयु का अनुपात 5 : 13 है और उनकी आयु का गुणनफल 585 है, तो 9 वर्ष बाद उनकी आयु का अनुपात ज्ञात कीजिए।", options: ["4 : 7", "1 : 2", "3 : 5", "2 : 5"], correct: 1 },
+                    { id: 35, text: "Q.35 (2x + 3)(x - 5) - (x - 2)(3x + 4) को सरल कीजिए।", options: ["x² - 5x - 7", "-x² + 5x - 7", "-x² - 5x + 7", "-x² - 5x - 7"], correct: 3 },
+                    { id: 36, text: "Q.36 ईंधन की कीमत में तीन क्रमागत महीनों में 20%, 30% और 20% की कमी हो जाती है, लेकिन चौथे महीने में 40% की वृद्धि हो जाती है। चौथे महीने में ईंधन की कीमत में उसकी मूल कीमत की तुलना में कितने प्रतिशत की वृद्धि/कमी हुई?", options: ["33.02% की कमी", "37.28% की कमी", "41.98% की वृद्धि", "36.01% की वृद्धि"], correct: 1 },
+                    { id: 37, text: "Q.37 एक शर्ट की कीमत में पहले 18% की वृद्धि होती है और फिर 18% की कमी होती है। इसकी कीमत में कुल कितने प्रतिशत की कमी हुई?", options: ["2.89%", "2.98%", "3.45%", "3.24%"], correct: 3 },
+                    { id: 38, text: "Q.38 एक टंकी का 5/8 भाग भरा हुआ है। यदि उसमें से 12 बाल्टी पानी निकाल दिया जाए और उसमें 9 बाल्टी पानी डाल दिया जाए, तो टंकी का 7/12 भाग भर जाएगा। कितने बाल्टी पानी टंकी में आ सकता है?", options: ["96", "60", "72", "48"], correct: 2 },
+                    { id: 39, text: "Q.39 दो रेलगाड़ियां 100 km/hr और 140 km/hr की चाल से विपरीत दिशाओं में चल रही हैं। एक रेलगाड़ी की लंबाई 490 m है। उन्हें एक-दूसरे को पार करने में 22 सेकंड का समय लगता है। दूसरी रेलगाड़ी की लंबाई (m में) ज्ञात कीजिए जो दशमलव के 2 स्थानों तक पूर्णांकित हो।", options: ["976.67", "982.47", "972.33", "974.27"], correct: 0 },
+                    { id: 40, text: "Q.40 एक समलंब चतुर्भुज के आकार के मैदान की समांतर भुजाएँ 60 m और 77 m हैं। असमांतर भुजाएँ 25 m और 26 m हैं। मैदान का क्षेत्रफल कितना है?", options: ["1,720 m²", "1,812 m²", "1,524 m²", "1,644 m²"], correct: 3 },
+                    { id: 41, text: "Q.41 यदि एक बेलन का संपूर्ण पृष्ठीय क्षेत्रफल दो वृत्तीय फलकों के क्षेत्रफल का 4 गुना है, तथा बेलन का आयतन 192π cm³ है, तो बेलन की ऊँचाई कितनी है?", options: ["16 cm", "8 cm", "12 cm", "9 cm"], correct: 2 },
+                    { id: 42, text: "Q.42 दो संख्याओं का अनुपात 2 : 3 है और उनका महत्तम समापवर्तक (HCF) 6 है। उनका लघुत्तम समापवर्त्य (LCM) ज्ञात कीजिए।", options: ["36", "12", "32", "18"], correct: 0 },
+                    { id: 43, text: "Q.43 एक बेंच का अंकित मूल्य ₹374 है, जो क्रय मूल्य से 22% अधिक है। यदि लाभ प्रतिशत 13% है, तो छूट प्रतिशत (दशमलव के दो स्थानों तक पूर्णांकित) ज्ञात कीजिए।", options: ["6.66%", "7.38%", "8.91%", "6.94%"], correct: 1 },
+                    { id: 44, text: "Q.44 दो ट्रकों की चाल का अनुपात 7 : 3 है। तेज़ चाल वाले ट्रक द्वारा 147 km की दूरी तय करने में लिया गया समय, दूसरे ट्रक से 7 घंटे कम है। धीमे ट्रक की चाल ज्ञात कीजिए।", options: ["22 km/hr", "12 km/hr", "9 km/hr", "4 km/hr"], correct: 1 },
+                    { id: 45, text: "Q.45 100 छात्रों की एक कक्षा ने भौतिकी की परीक्षा दी। 37 छात्रों का औसत स्कोर 84 था। अन्य छात्रों का औसत स्कोर 96 था। पूरी कक्षा का औसत स्कोर (दशमलव के एक स्थान तक पूर्णांकित) कितना होगा?", options: ["97.5", "89.7", "85.5", "91.6"], correct: 3 },
+                    { id: 46, text: "Q.46 A और B मिलकर किसी कार्य को 4 दिनों में पूरा कर सकते हैं। B अकेले उसी कार्य को 8 दिनों में पूरा कर सकता है। A अकेले उसी कार्य का दोगुना कार्य कितने समय (दिन में) पूरा करेगा?", options: ["8", "16", "19", "17"], correct: 1 },
+                    { id: 47, text: "Q.47 एक कक्षा के 35 छात्रों की औसत आयु 46 वर्ष है। यदि शिक्षक की आयु भी शामिल कर ली जाए, तो पूरे समूह की औसत आयु 47 वर्ष हो जाती है। शिक्षक की आयु (वर्ष में) ज्ञात कीजिए।", options: ["83", "82", "84", "85"], correct: 1 },
+                    { id: 48, text: "Q.48 A किसी कार्य को 77 दिनों में पूरा कर सकता है। B, A से 75% कम कुशल है। C, B से 40% अधिक कुशल है। यदि B और C मिलकर 30 दिनों तक कार्य करते हैं, तो A अकेले शेष कार्य को कितने दिनों में पूरा करेगा?", options: ["60 दिन", "57 दिन", "59 दिन", "54 दिन"], correct: 2 },
+                    { id: 49, text: "Q.49 यदि किसी संख्या के 20% को 96 में जोड़ा जाए, तो परिणाम में वही संख्या प्राप्त होगी। उसी संख्या का 75% कितना होगा?", options: ["100", "90", "110", "120"], correct: 1 },
+                    { id: 50, text: "Q.50 यदि ₹594 अंकित मूल्य वाली एक वस्तु को ₹155 में बेचा जाता है, तो छूट प्रतिशत क्या है? (अपने उत्तर को दशमलव के दो स्थानों तक पूर्णांकित करें)।", options: ["77.24%", "72.91%", "73.91%", "74.35%"], correct: 2 }
+                ]
+            },
+            reasoning: {
+                name: "Reasoning",
+                questions: [
+                    { id: 51, text: "Q.51 HN 9, LK-3 से एक निश्चित तरीके से संबंधित है। इसी प्रकार NY 4, RV-8 से संबंधित है। इसी तर्क का पालन करते हुए, OU 13 दिए गए विकल्पों में से किससे संबंधित है?", options: ["HU 5", "HY 3", "SR 1", "TY 2"], correct: 2 },
+                    { id: 52, text: "Q.52 निम्नलिखित त्रिकों में, प्रत्येक अक्षर-समूह एक निश्चित तर्क का अनुसरण करते हुए अगले समूह से संबंधित है। दिए गए विकल्पों में से उस विकल्प का चयन कीजिए, जो समान तर्क का अनुसरण करता हो।\nWASH-HSWA - WSAH\nCORE-ERCO - CROE", options: ["DARE-ARDE - ARED", "LEAP-LAEP - PAEL", "FINE-ENFI - INFE", "INKS-SKIN - IKNS"], correct: 3 },
+                    { id: 53, text: "Q.53 पिया बिंदु A से शुरू होकर दक्षिण की ओर 33 km चलती है। फिर वह दाएं मुड़ती है, 45 km चलती है, फिर दाएं मुड़कर 41 km चलती है। फिर वह दाएं मुड़कर 56 km चलती है। अंत में वह दाएं मुड़ती है, 8 km चलती है और बिंदु P पर रुकती है। बिंदु A पर दोबारा पहुँचने के लिए उसे कितनी दूरी (सबसे कम दूरी) और किस दिशा में चलना चाहिए?", options: ["पूर्व में 13 km", "पश्चिम में 11 km", "पूर्व में 12 km", "पश्चिम में 10 km"], correct: 1 },
+                    { id: 54, text: "Q.54 उस त्रिक का चयन कीजिए जो नीचे दिए गए दो त्रिकों के समान पैटर्न का अनुसरण करता है। दोनों त्रिक समान पैटर्न का अनुसरण करते हैं।\nPI-MF-KN\nSL-PI-NQ", options: ["VO-SL-QU", "WO-SK-QU", "WO-SL-QU", "VO-SL-QT"], correct: 3 },
+                    { id: 55, text: "Q.55 निम्नलिखित में से कौन-सा अक्षर-संख्या समूह दी गई श्रृंखला को तार्किक रूप से पूर्ण बनाने के लिए प्रश्न-चिह्न (?) के स्थान पर आएगा?\nVDE97, BJK74, HPQ51, NVW28, ?", options: ["TUC5", "TBC5", "TBG5", "IBC5"], correct: 1 },
+                    { id: 56, text: "Q.56 यदि संख्या 1732596 में प्रत्येक अंक को बाएँ से दाएँ आरोही क्रम में व्यवस्थित किया जाए, तो मूल संख्या की तुलना में कितने अंकों का स्थान अपरिवर्तित रहेगा?", options: ["दो", "एक", "तीन", "एक भी नहीं"], correct: 0 },
+                    { id: 57, text: "Q.57 निम्नलिखित श्रृंखला का संदर्भ लीजिए तथा दिए गए प्रश्न का उत्तर दीजिए (सभी संख्याएं केवल एकल-अंकीय संख्याएं हैं)।\n(बाएं) 91637418592 (दाएं)\nऐसी कितनी सम संख्याएं हैं (बाएं से दाएं), जिनके ठीक बाद एक सम संख्या आती है?", options: ["तीन", "दो", "एक", "एक भी नहीं"], correct: 3 },
+                    { id: 58, text: "Q.58 अंग्रेजी वर्णमाला क्रम पर आधारित, निम्नलिखित चार अक्षर-समूहों में से तीन एक निश्चित तरीके से एकसमान हैं और इस प्रकार वे एक ग्रुप बनाते हैं। कौन-सा अक्षर-समूह, उस ग्रुप से संबंधित नहीं है?", options: ["QRN", "UWR", "WXT", "STP"], correct: 1 },
+                    { id: 59, text: "Q.59 सात व्यक्ति B, C, D, I, J, K और L, एक सीधी पंक्ति में उत्तर की ओर अभिमुख होकर बैठे हैं। K के बाईं ओर कोई नहीं बैठा है। K और L के बीच केवल चार व्यक्ति बैठे हैं। L के बाईं ओर दूसरे स्थान पर B बैठा है। B के ठीक बाईं ओर पड़ोस में D बैठा है। L का निकटतम पड़ोसी C नहीं है। L और C के बीच कितने व्यक्ति बैठे हैं?", options: ["तीन", "एक", "दो", "चार"], correct: 2 },
+                    { id: 60, text: "Q.60 60 व्यक्ति उत्तर दिशा की ओर अभिमुख एक पंक्ति में खड़े हैं। शिवानी दाएं छोर से 40वें स्थान पर है जबकि नेहा बाएं छोर से 26 वें स्थान पर है। शिवानी और स्नेहा के बीच कितने व्यक्ति हैं?", options: ["2", "4", "3", "1"], correct: 1 },
+                    { id: 61, text: "Q.61 A, B, C, D, E, F और G एक गोल मेज के परितः केंद्र की ओर अभिमुख होकर बैठे हैं। F, B के दाईं ओर दूसरे स्थान पर बैठा है। A, F के बाईं ओर तीसरे स्थान पर बैठा है। C, E और A का निकटतम पड़ोसी है। G, B का निकटतम पड़ोसी नहीं है। D के बाईं ओर से गिनने पर D और E के बीच कितने व्यक्ति बैठे हैं?", options: ["एक", "दो", "तीन", "चार"], correct: 2 },
+                    { id: 62, text: "Q.62 अंग्रेजी वर्णमाला क्रम के आधार पर दी गई श्रृंखला में प्रश्न-चिह्न (?) के स्थान पर क्या आना चाहिए?\nDWV LED TML BUT ?", options: ["JCB", "JBC", "JIO", "IBH"], correct: 0 },
+                    { id: 63, text: "Q.63 दी गई श्रृंखला में प्रश्न-चिन्ह (?) के स्थान पर क्या आएगा?\n36 41 51 66 86 ?", options: ["111", "107", "117", "100"], correct: 0 },
+                    { id: 64, text: "Q.64 लिएंडर बिंदु A से चलना शुरू करता है और पूर्व की ओर 6 km गाड़ी चलाता है। फिर वह बाएं मुड़ता है, 4 km गाड़ी चलाता है, फिर बाएं मुड़ता है और 3 km गाड़ी चलाता है। फिर वह दाएं मुड़ता है और 3 km गाड़ी चलाता है। अंत में वह बाएं मुड़ता है, 3 km गाड़ी चलाता है और बिंदु P पर रुकता है। बिंदु A पर दोबारा पहुँचने के लिए उसे कितनी दूर (न्यूनतम दूरी) और किस दिशा में गाड़ी चलानी चाहिए?", options: ["दक्षिण की ओर 3 km", "दक्षिण की ओर 7 km", "पश्चिम की ओर 6 km", "उत्तर की ओर 6 km"], correct: 1 },
+                    { id: 65, text: "Q.65 योगेश अपनी कक्षा में ऊपर से 34वें स्थान पर और नीचे से 38वें स्थान पर है। उसकी कक्षा में कितने विद्यार्थी हैं?", options: ["70", "73", "71", "72"], correct: 2 },
+                    { id: 66, text: "Q.66 निम्नलिखित संख्या, प्रतीक श्रृंखला का संदर्भ लें और नीचे दिए गए प्रश्न का उत्तर दें। गिनती केवल बाएं से दाएं की ओर की जानी है। सभी संख्याएं एकल-अंकीय संख्याएं हैं।\n(बाएं) @ 7 € $ 5 $ & * & 7 5 2 $ 8 $ 7 4 6 £ (दाएं)\nऐसे कितने प्रतीक हैं, जिनमें से प्रत्येक के ठीक पहले एक संख्या और ठीक बाद एक प्रतीक है?", options: ["दो", "तीन", "पाँच", "चार"], correct: 1 },
+                    { id: 67, text: "Q.67 यदि 'A' का अर्थ '÷' है, 'B' का अर्थ '×' है, 'C' का अर्थ '+' है और 'D' का अर्थ '-' है, तो निम्नलिखित समीकरण में प्रश्न-चिह्न '?' के स्थान पर क्या आएगा?\n25 C 15 A 3 D 9 B 3 = ?", options: ["1", "3", "4", "2"], correct: 1 },
+                    { id: 68, text: "Q.68 कथन:\nसभी ट्रैक्टर, मोटरसाइकिल हैं।\nकुछ मोटरसाइकिल, मिनीवैन हैं।\nकोई मिनीवैन, होवरक्राफ्ट नहीं है।\nनिष्कर्ष:\n(I) कुछ होवरक्राफ्ट, मोटरसाइकिल हैं।\n(II) कुछ मिनीवैन, ट्रैक्टर हैं।", options: ["न तो निष्कर्ष (I) और न ही (II) अनुसरण करता है", "निष्कर्ष (I) और (II) दोनों अनुसरण करते हैं", "केवल निष्कर्ष (II) अनुसरण करता है", "केवल निष्कर्ष (I) अनुसरण करता है"], correct: 0 },
+                    { id: 69, text: "Q.69 सात व्यक्ति, A, B, C, D, E, F और G, एक पंक्ति में, उत्तर की ओर अभिमुख होकर बैठे हैं। C के दाईं ओर केवल छह व्यक्ति बैठे हैं। B के बाईं ओर केवल चार व्यक्ति बैठे हैं। D, A के बाईं ओर लेकिन B के दाईं ओर बैठा है। G के दाईं ओर दूसरे स्थान पर F बैठा है। E के दाईं ओर कितने व्यक्ति बैठे हैं?", options: ["तीन", "चार", "दो", "एक"], correct: 1 },
+                    { id: 70, text: "Q.70 निम्नलिखित श्रृंखला का संदर्भ लीजिए तथा दिए गए प्रश्न का उत्तर दीजिए (सभी संख्याएं केवल एकल-अंकीय संख्याएं हैं)।\n(बाएं) 281579423861 (दाएं)\nऐसी कितनी विषम संख्याएं हैं (बाएं से दाएं), जिनके ठीक बाद एक सम संख्या आती है?", options: ["दो", "तीन", "एक", "तीन से अधिक"], correct: 0 },
+                    { id: 71, text: "Q.71 एक कूट भाषा में,\nA + B का अर्थ है कि 'A, B की बहन है'\nA - B का अर्थ है कि 'A, B का पिता है'\nA × B का अर्थ है कि 'A, B का भाई है'\nA ÷ B का अर्थ है कि 'A, B की माता है'\nउपरोक्त के आधार पर, यदि 'P ÷ T - C + D + E' है तो P का E से क्या संबंध है?", options: ["भाई", "माता के पिता", "पिता के पिता", "माता का भाई"], correct: 1 },
+                    { id: 72, text: "Q.72 निम्नलिखित संख्या और प्रतीक श्रृंखला का संदर्भ लीजिए तथा दिए गए प्रश्न का उत्तर दीजिए। गिनती केवल बाएं से दाएं की जानी है।\n(बाएं) ? + ? & 3 # 9 % 4 1 6 * @ 5 4 8 8 $ (दाएं)\nऐसी कितनी संख्याएं हैं, जिनमें से प्रत्येक के ठीक पहले एक अन्य संख्या है तथा ठीक बाद एक प्रतीक है?", options: ["एक", "दो", "चार", "तीन"], correct: 1 },
+                    { id: 73, text: "Q.73 एक निश्चित कूट भाषा में, 'OVAL' को '6729' और 'LEVO' को '7946' लिखा जाता है। दी गई कूट भाषा में 'E' का कूट क्या है?", options: ["9", "6", "7", "4"], correct: 3 },
+                    { id: 74, text: "Q.74 उस सेट का चयन कीजिए जिसमें संख्याएँ उसी प्रकार संबंधित हैं जिस प्रकार निम्नलिखित सेटों की संख्याएँ संबंधित हैं।\n(22, 66, 61)\n(35, 105, 100)", options: ["(74, 222, 216)", "(14, 42, 37)", "(41, 123, 117)", "(85, 255, 249)"], correct: 1 },
+                    { id: 75, text: "Q.75 कथन:\nसभी फूल, पौधे हैं।\nकुछ पौधे, पेड़ हैं।\nनिष्कर्ष:\n(I) कुछ पेड़, फूल हैं।\n(II) सभी फूल, पेड़ हैं।", options: ["निष्कर्ष (I) और (II) दोनों अनुसरण करते हैं।", "न तो निष्कर्ष (I) और न ही (II) अनुसरण करता है।", "केवल निष्कर्ष (II) अनुसरण करता है।", "केवल निष्कर्ष (I) अनुसरण करता है।"], correct: 1 },
+                    { id: 76, text: "Q.76 दी गई श्रृंखला में प्रश्न-चिह्न (?) के स्थान पर क्या आएगा?\n12 ? 29 39 50 62", options: ["16", "18", "20", "22"], correct: 2 },
+                    { id: 77, text: "Q.77 अंग्रेजी वर्णमाला क्रम के आधार पर, निम्नलिखित चार अक्षर-समूह युग्मों में से तीन एक निश्चित रूप से एकसमान हैं और इस प्रकार एक ग्रुप बनाते हैं। कौन-सा अक्षर-समूह युग्म उस ग्रुप से संबंधित नहीं है?", options: ["WC-OL", "HM-ZW", "SY-KH", "BH-TQ"], correct: 1 },
+                    { id: 78, text: "Q.78 किसी निश्चित कूट भाषा में, 'steak equal thing' को 'wb vl yn' के रूप में और 'thing yard house' को 'vl za ha' के रूप में कूटबद्ध किया गया है। दी गई भाषा में 'thing' को किस प्रकार कूटबद्ध किया गया है?", options: ["za", "wb", "vl", "yn"], correct: 2 },
+                    { id: 79, text: "Q.79 दी गई श्रृंखला में प्रश्न-चिह्न (?) के स्थान पर क्या आएगा?\n510 511 500 501 491 492 ?", options: ["483", "481", "482", "490"], correct: 0 },
+                    { id: 80, text: "Q.80 यदि '+' और '-' को परस्पर बदल दिया जाए तथा '×' और '÷' को परस्पर बदल दिया जाए, तो निम्नलिखित समीकरण में प्रश्न-चिह्न (?) के स्थान पर क्या आएगा?\n850 + 34 × 15 - 12 ÷ 400 = ?", options: ["239", "240", "245", "233"], correct: 2 }
+                ]
+            },
+            ga: {
+                name: "General Awareness",
+                questions: [
+                    { id: 81, text: "Q.81 मार्च 2025 में जारी वर्ल्ड हैप्पीनेस रिपोर्ट, 2025 के अनुसार, निम्नलिखित में से कौन-सा देश दुनिया का सबसे खुशहाल देश है?", options: ["न्यूजीलैंड", "फिनलैंड", "स्विट्जरलैंड", "कनाडा"], correct: 1 },
+                    { id: 82, text: "Q.82 अप्रैल 2025 में, पहलगाम आतंकी हमले के बाद भारत सरकार ने भारत और पाकिस्तान की कौन-सी सीमा चौकी बंद कर दी थी?", options: ["खोखरापार-मुनाबाओ बॉर्डर (Khokhrapar-Munabao border)", "गंडा सिंह वाला-हुसैनीवाला बॉर्डर (Ganda Singh Wala-Hussainiwala border)", "रेडक्लिफ़ रेखा (Radcliffe Line)", "अटारी-वाघा बॉर्डर (Attari-Wagah border)"], correct: 3 },
+                    { id: 83, text: "Q.83 जुलाई 2025 में, किस जांच प्राधिकरण ने कर्नाटक में ₹24 करोड़ से अधिक की बेहिसाब परिसंपत्ति का पता लगाया?", options: ["प्रवर्तन निदेशालय", "केंद्रीय जांच ब्यूरो", "कर्नाटक लोकायुक्त", "आयकर विभाग"], correct: 2 },
+                    { id: 84, text: "Q.84 29 जुलाई से 1 अगस्त 2025 तक दिल्ली-एनसीआर (राष्ट्रीय राजधानी क्षेत्र) में आयोजित मेगा आपदा प्रबंधन अभ्यास का नाम क्या है?", options: ["अभ्यास सुरक्षित भारत (Exercise Surakshit Bharat)", "अभ्यास रक्षा कवच (Exercise Raksha Kavach)", "अभ्यास सुरक्षा चक्र (Exercise Suraksha Chakra)", "अभ्यास आपदा मित्र (Exercise Disaster Mitra)"], correct: 2 },
+                    { id: 85, text: "Q.85 2025 कलिंगा सुपर कप (2025 Kalinga Super Cup) में कौन-सी टीम उपविजेता रही?", options: ["जमशेदपुर FC", "बेंगलुरु FC", "हैदराबाद FC", "केरला ब्लास्टर्स FC"], correct: 0 },
+                    { id: 86, text: "Q.86 1 जनवरी 2025 को केंद्रीय मंत्री डॉ. जितेंद्र सिंह द्वारा बताए गए के अनुसार, भारत के जैव-प्रौद्योगिकी क्षेत्र में असाधारण रूप से वृद्धि हुई है, जो 2014 में $10 बिलियन के उद्योग से बढ़कर 2024 में ______ से अधिक हो गई है।", options: ["$140 बिलियन", "$80 बिलियन", "$130 बिलियन", "$100 बिलियन"], correct: 2 },
+                    { id: 87, text: "Q.87 अप्रैल 2025 में लॉरियस वर्ल्ड स्पोर्ट्स अवार्ड्स में किस टीम को \"टीम ऑफ द ईयर (Team of the Year)\" से सम्मानित किया गया?", options: ["बायर्न म्यूनिख (Bayern Munich)", "मैनचेस्टर सिटी (Manchester City)", "रियल मैड्रिड (Real Madrid)", "फ्लामेंगो (Flamengo)"], correct: 2 },
+                    { id: 88, text: "Q.88 जून 2025 में अधिसूचित, कॉर्पोरेट बीमा के लिए भारत का अपनी तरह का पहला प्रीमियम फाइनेंसिंग सॉल्यूशन (premium financing solution) निम्नलिखित में से किसके द्वारा लॉन्च किया गया?", options: ["जे.एम. फाइनेंसियल म्यूचुअल फंड (JM Financial Mutual Fund)", "क्रेडिट एक्सेस लाइफ इंश्योरेंस (Credit Access Life Insurance)", "बीमापे फिनश्योर (BimaPay Finsure)", "रिलायंस निप्पॉन लाइफ इंश्योरेंस (Reliance Nippon Life Insurance)"], correct: 2 },
+                    { id: 89, text: "Q.89 किसने (महिला) 25 m पूल में 48 घंटे में सबसे अधिक दूरी तक तैरने का विश्व रिकॉर्ड बनाया और केवल 2 दिनों में 149.02 km (92.59 मील) की आश्चर्यजनक दूरी तय की?", options: ["करोलिना स्ज़ेपनियाक (Karolina Szczepaniak)", "डायना न्याद (Diana Nyad)", "सारा थॉमस (Sarah Thomas)", "केटी लेडेकी (Katie Ledecky)"], correct: 0 },
+                    { id: 90, text: "Q.90 14 मई 2025 को भारत के 52वें मुख्य न्यायाधीश कौन बने ?", options: ["विद्युत रंजन सारंगी", "भूषण रामकृष्ण गवई", "मदन लोकुर", "संजीव खन्ना"], correct: 1 },
+                    { id: 91, text: "Q.91 मार्च 2025 में, निम्नलिखित में से किस योजना के तहत सरकार ने 100 तटीय मछुआरा गांवों की पहचान की है जिन्हें जलवायु-अनुकूल तटीय मछुआरा गांवों के रूप में विकसित किया जाएगा?", options: ["प्रधानमंत्री मत्स्य संपदा योजना (PMMSY)", "नीली क्रांति योजना", "किसान सम्मान निधि योजना (KSNY)", "राष्ट्रीय तटीय मिशन"], correct: 0 },
+                    { id: 92, text: "Q.92 स्टार्टअपब्लिंक ग्लोबल स्टार्टअप इकोसिस्टम इंडेक्स (StartupBlink Global Startup Ecosystem Index) 2025 के अनुसार, 2025 में दुनिया के शीर्ष स्टार्टअप शहरों में कौन-सा भारतीय शहर शीर्ष स्थान पर है?", options: ["पुणे", "दिल्ली", "बेंगलुरु", "हैदराबाद"], correct: 2 },
+                    { id: 93, text: "Q.93 भारत में, वर्ष 2025 में विश्व हिंदी दिवस किस तिथि को मनाया गया?", options: ["21 फरवरी", "10 जनवरी", "17 फरवरी", "9 मई"], correct: 1 },
+                    { id: 94, text: "Q.94 मई 2025 में 'यूनेस्को गिलर्मो कैनो वर्ल्ड प्रेस फ्रीडम प्राइज (UNESCO/Guillermo Cano World Press Freedom Prize)' किसे प्रदान किया गया?", options: ["नरगिस मोहम्मदी (Narges Mohammadi)", "ला प्रेसा (La Prensa)", "मारिया रेसा (Maria Ressa)", "माज़ेन डरविश (Mazen Darwish)"], correct: 1 },
+                    { id: 95, text: "Q.95 भारतीय रिजर्व बैंक के निर्देशानुसार, सभी बैंकों को 31 अक्टूबर, 2025 तक किस नए डोमेन पर माइग्रेट करना होगा?", options: [".gov.in", ".bank.in", ".rbi.in", ".fin.in"], correct: 1 },
+                    { id: 96, text: "Q.96 2025 में भारत का पहला चिड़ियाघर-आधारित वन्यजीव बायो बैंक कहाँ स्थापित किया गया है?", options: ["नेहरू जूलॉजिकल पार्क", "नंदनकानन जूलॉजिकल पार्क", "पद्मजा नायडू हिमालयन जूलॉजिकल पार्क", "महेंद्र चौधरी जूलॉजिकल पार्क"], correct: 2 },
+                    { id: 97, text: "Q.97 युवा मामले और खेल मंत्रालय द्वारा पूर्व (सेवानिवृत्त) खिलाड़ी सशक्तिकरण प्रशिक्षण (RESET) कार्यक्रम आधिकारिक तौर पर कब शुरू किया गया था?", options: ["2024", "2025", "2022", "2023"], correct: 0 },
+                    { id: 98, text: "Q.98 कर्नाटक 2025-26 राज्य बजट में अल्पसंख्यकों के लिए ₹50,000 सामूहिक विवाह प्रोत्साहन योजना की घोषणा किसने की?", options: ["सिद्धारमैया", "बी.एस. येदियुरप्पा", "बसवराज बोम्मई", "डी. के. शिवकुमार"], correct: 0 },
+                    { id: 99, text: "Q.99 2025 में, लखनऊ में एक अत्याधुनिक स्वचालित स्वास्थ्य देखभाल मशीन, बुनियादी परीक्षण और निदान के लिए एक स्व-सेवा डिजिटल स्वास्थ्य कियोस्क (self-service digital health kiosk), स्थापित किया गया। इसे क्या कहा जाता है?", options: ["हेल्थ पॉड (Health Pod)", "हेल्थ ATM (Health ATM)", "ई-क्लिनिक बूथ (e-Clinic Booth)", "मेड कियोस्क (Med Kiosk)"], correct: 1 },
+                    { id: 100, text: "Q.100 जून 2025 में, केंद्रीय जनजातीय मामलों के मंत्रालय द्वारा शुरू की गई पहल का नाम क्या है, जिसका उद्देश्य समर्पित कार्यान्वयनकर्ताओं (dedicated implementers) की एक नई पीढ़ी को प्रशिक्षित और प्रेरित करके जनजातीय कल्याण योजनाओं के वितरण को सुदृढ़ करना है?", options: ["आदि गोत्र (Adi Gotra)", "आदि कर्मयोगी (Adi Karmyogi)", "आदि वंश (Adi Vamsha)", "आदि वरनाडा (Adi Varnada)"], correct: 1 }
+                ]
+            }
+        };
+
+        let currentSubject = 'science';
+        let currentQIndex = 0;
+
+        let userAnswers = {};
+        let qStatus = {};
+
+        for (let sub in examData) {
+            userAnswers[sub] = new Array(examData[sub].questions.length).fill(null);
+            qStatus[sub] = new Array(examData[sub].questions.length).fill('not-visited');
+        }
+
+        // Timer Logic
+        let totalSeconds = 90 * 60;
+        const timerDisplay = document.getElementById('timer-display');
+
+        const timerInterval = setInterval(() => {
+            let minutes = Math.floor(totalSeconds / 60);
+            let seconds = totalSeconds % 60;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+            timerDisplay.innerText = `${minutes}:${seconds}`;
+
+            if (totalSeconds <= 0) {
+                clearInterval(timerInterval);
+                alert("Time Over! Test automatically submit ho raha hai.");
+                submitTest();
+            }
+            totalSeconds--;
+        }, 1000);
+
+        function switchSubject(subKey, evt) {
+            currentSubject = subKey;
+            currentQIndex = 0;
+
+            const btns = document.querySelectorAll('.tab-btn');
+            btns.forEach(btn => btn.classList.remove('active'));
+            if (evt && evt.target) {
+                evt.target.classList.add('active');
+            }
+
+            document.getElementById('subject-title').innerText = examData[subKey].name;
+            loadQuestion(0);
+        }
+
+        function loadQuestion(index) {
+            currentQIndex = index;
+            const qList = examData[currentSubject].questions;
+            const q = qList[index];
+
+            if (qStatus[currentSubject][index] === 'not-visited') {
+                qStatus[currentSubject][index] = 'not-answered';
+            }
+
+            document.getElementById('question-number').innerText = `Question No. ${q.id}`;
+            document.getElementById('question-text').innerText = q.text;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            q.options.forEach((opt, optIdx) => {
+                const isChecked = userAnswers[currentSubject][index] === optIdx;
+                const label = document.createElement('label');
+                if (isChecked) {
+                    label.classList.add('selected-option');
+                }
+                
+                label.innerHTML = `
+                    <input type="radio" name="opt" value="${optIdx}" ${isChecked ? 'checked' : ''}>
+                    <span>${opt}</span>
+                `;
+                
+                label.addEventListener('click', function () {
+                    document.querySelectorAll('.options-container label').forEach(l => l.classList.remove('selected-option'));
+                    this.classList.add('selected-option');
+                    const radio = this.querySelector('input[type="radio"]');
+                    if (radio) {
+                        radio.checked = true;
+                    }
+                    
+                    userAnswers[currentSubject][currentQIndex] = optIdx;
+                    qStatus[currentSubject][currentQIndex] = 'answered';
+                    updatePaletteUI();
+                });
+
+                container.appendChild(label);
+            });
+
+            updatePaletteUI();
+        }
+
+        function saveAndNext() {
+            const selectedOpt = document.querySelector('input[name="opt"]:checked');
+            if (selectedOpt) {
+                userAnswers[currentSubject][currentQIndex] = parseInt(selectedOpt.value);
+                qStatus[currentSubject][currentQIndex] = 'answered'; // GREEN
+            } else {
+                if (qStatus[currentSubject][currentQIndex] !== 'review') {
+                    qStatus[currentSubject][currentQIndex] = 'not-answered'; // RED
+                }
+            }
+
+            const qList = examData[currentSubject].questions;
+            if (currentQIndex < qList.length - 1) {
+                loadQuestion(currentQIndex + 1);
+            } else {
+                updatePaletteUI();
+                alert(`Aap ${examData[currentSubject].name} section ke aakhri question par hain!`);
+            }
+        }
+
+        function clearOption() {
+            userAnswers[currentSubject][currentQIndex] = null;
+            qStatus[currentSubject][currentQIndex] = 'not-answered'; // RED
+            loadQuestion(currentQIndex);
+        }
+
+        function markForReview() {
+            const selectedOpt = document.querySelector('input[name="opt"]:checked');
+            if (selectedOpt) {
+                userAnswers[currentSubject][currentQIndex] = parseInt(selectedOpt.value);
+            }
+            qStatus[currentSubject][currentQIndex] = 'review'; // PURPLE
+
+            const qList = examData[currentSubject].questions;
+            if (currentQIndex < qList.length - 1) {
+                loadQuestion(currentQIndex + 1);
+            } else {
+                updatePaletteUI();
+            }
+        }
+
+        function updatePaletteUI() {
+            const paletteGrid = document.getElementById('question-palette');
+            paletteGrid.innerHTML = '';
+
+            const qList = examData[currentSubject].questions;
+            let countAnswered = 0, countNotAnswered = 0, countNotVisited = 0, countReview = 0;
+
+            qList.forEach((q, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `q-btn ${idx === currentQIndex ? 'active' : ''}`;
+                btn.innerText = q.id;
+
+                const status = qStatus[currentSubject][idx];
+                if (status === 'answered') {
+                    btn.classList.add('status-answered');
+                    countAnswered++;
+                } else if (status === 'not-answered') {
+                    btn.classList.add('status-not-answered');
+                    countNotAnswered++;
+                } else if (status === 'review') {
+                    btn.classList.add('status-review');
+                    countReview++;
+                } else {
+                    btn.classList.add('status-not-visited');
+                    countNotVisited++;
+                }
+
+                btn.onclick = () => loadQuestion(idx);
+                paletteGrid.appendChild(btn);
+            });
+
+            document.getElementById('count-answered').innerText = countAnswered;
+            document.getElementById('count-not-answered').innerText = countNotAnswered;
+            document.getElementById('count-not-visited').innerText = countNotVisited;
+            document.getElementById('count-review').innerText = countReview;
+        }
+
+        function submitTest() {
+            clearInterval(timerInterval);
+
+            let totalMarks = 0;
+            let totalCorrect = 0;
+            let totalWrong = 0;
+
+            for (let sub in examData) {
+                const qList = examData[sub].questions;
+                qList.forEach((q, idx) => {
+                    const ans = userAnswers[sub][idx];
+                    if (ans !== null) {
+                        if (ans === q.correct) {
+                            totalMarks += 1;
+                            totalCorrect++;
+                        } else {
+                            totalMarks -= 0.33;
+                            totalWrong++;
+                        }
+                    }
+                });
+            }
+
+            alert(`--- FINAL RESULT SUMMARY ---
+Total Correct: ${totalCorrect}
+Total Wrong: ${totalWrong}
+Final Score: ${totalMarks.toFixed(2)} Marks`);
+        }
+
+        loadQuestion(0);
+    </script>
+</body>
+</html>
